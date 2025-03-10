@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
+import VirtualWorld from "./pages/VirtualWorld";
+import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,8 +25,8 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/virtual-world" element={<NotFound />} />
-          <Route path="/community" element={<NotFound />} />
+          <Route path="/virtual-world" element={<VirtualWorld />} />
+          <Route path="/community" element={<Community />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
