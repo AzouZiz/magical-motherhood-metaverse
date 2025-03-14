@@ -14,6 +14,7 @@ export const useAdmin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [assistantAdmins, setAssistantAdmins] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +40,11 @@ export const useAdmin = () => {
           return;
         }
         
+        // Save user email
+        if (session.user?.email) {
+          setUserEmail(session.user.email);
+        }
+        
         // الحصول على معلومات الملف الشخصي للمستخدم
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -52,28 +58,38 @@ export const useAdmin = () => {
           return;
         }
         
-        setProfile(profileData as Profile);
+        const updatedProfile = {
+          ...profileData as Profile,
+          email: session.user.email // Add email from session
+        };
+        
+        setProfile(updatedProfile);
         setIsSuperAdmin(profileData.role === 'super');
         
         // الحصول على قائمة المشرفين المساعدين
         if (profileData.role === 'super') {
           const { data: assistantsData, error: assistantsError } = await supabase
             .from('profiles')
-            .select('name, id, role')
+            .select('id, name, role')
             .eq('role', 'helper');
           
           if (!assistantsError && assistantsData) {
-            // الحصول على معلومات البريد الإلكتروني لكل مشرف مساعد
+            // الحصول على معلومات المشرفين المساعدين
             const adminsWithEmail: AdminUser[] = [];
             
             for (const admin of assistantsData) {
-              const { data: userData } = await supabase.auth.admin.getUserById(admin.id);
-              if (userData.user) {
-                adminsWithEmail.push({
-                  name: admin.name || 'مساعد المشرف',
-                  email: userData.user.email || '',
-                  role: 'helper'
-                });
+              try {
+                const { data: userData } = await supabase.auth.admin.getUserById(admin.id);
+                if (userData && userData.user) {
+                  adminsWithEmail.push({
+                    id: admin.id,
+                    name: admin.name || 'مساعد المشرف',
+                    email: userData.user.email || '',
+                    role: 'helper'
+                  });
+                }
+              } catch (err) {
+                console.error("Error fetching admin user:", err);
               }
             }
             
@@ -93,8 +109,12 @@ export const useAdmin = () => {
       if (!session) {
         setProfile(null);
         setIsSuperAdmin(false);
+        setUserEmail('');
         navigate('/admin-login');
       } else {
+        if (session.user?.email) {
+          setUserEmail(session.user.email);
+        }
         getProfileAndAssistants();
       }
     });
@@ -127,6 +147,7 @@ export const useAdmin = () => {
   return {
     profile,
     adminUser: profile,
+    userEmail,
     isSuperAdmin,
     assistantAdmins,
     setAssistantAdmins,

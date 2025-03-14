@@ -12,6 +12,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 const Admin = () => {
   const {
     adminUser,
+    userEmail,
     isSuperAdmin,
     assistantAdmins,
     setAssistantAdmins,
@@ -28,7 +29,7 @@ const Admin = () => {
     <AdminProtected>
       <div className="min-h-screen bg-gray-50">
         <AdminHeader 
-          email={adminUser.email} 
+          email={userEmail} 
           isSuperAdmin={isSuperAdmin} 
           onLogout={handleLogout} 
         />

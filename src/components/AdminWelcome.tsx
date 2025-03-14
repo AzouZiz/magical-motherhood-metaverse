@@ -10,6 +10,7 @@ import { supabase, Profile } from '@/integrations/supabase/client';
 const AdminWelcome = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string>('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -23,6 +24,11 @@ const AdminWelcome = () => {
         if (!session) {
           setLoading(false);
           return;
+        }
+        
+        // Get user's email
+        if (session.user?.email) {
+          setUserEmail(session.user.email);
         }
         
         const { data, error } = await supabase
@@ -46,7 +52,11 @@ const AdminWelcome = () => {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         setProfile(null);
+        setUserEmail('');
       } else {
+        if (session.user?.email) {
+          setUserEmail(session.user.email);
+        }
         getProfile();
       }
     });
@@ -103,7 +113,7 @@ const AdminWelcome = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm">الاسم: {profile.name || 'المشرف'}</p>
-            <p className="text-sm">البريد الإلكتروني: {supabase.auth.getUser().then(({ data }) => data.user?.email)}</p>
+            <p className="text-sm">البريد الإلكتروني: {userEmail}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleAdminPanel}>

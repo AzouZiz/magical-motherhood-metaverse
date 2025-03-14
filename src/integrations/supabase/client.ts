@@ -19,9 +19,11 @@ export type Profile = {
   role: string;
   created_at: string;
   updated_at: string;
+  email?: string; // Adding email field as optional for compatibility
 };
 
 export type AdminUser = {
+  id?: string;
   name: string;
   email: string;
   role: 'super' | 'helper';

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,6 +68,7 @@ const AdminsManagement = ({
           
           // 3. إضافة المشرف المساعد إلى القائمة المحلية
           setAssistantAdmins([...assistantAdmins, {
+            id: signUpData.user.id,
             name: newAdmin.name,
             email: newAdmin.email,
             role: 'helper' as 'helper'
@@ -113,32 +113,28 @@ const AdminsManagement = ({
 
   const removeAdmin = async (email: string) => {
     try {
-      // 1. الحصول على معرف المستخدم من البريد الإلكتروني
-      const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
+      // Find the admin to be removed
+      const adminToRemove = assistantAdmins.find(admin => admin.email === email);
       
-      if (userError) throw userError;
-      
-      const userToRemove = userData.users.find(user => user.email === email);
-      
-      if (userToRemove) {
-        // 2. تحديث دور المستخدم في جدول الملفات الشخصية
-        const { error: updateProfileError } = await supabase
-          .from('profiles')
-          .update({ role: 'user' })
-          .eq('id', userToRemove.id);
-        
-        if (updateProfileError) throw updateProfileError;
-        
-        // 3. إزالة المشرف المساعد من القائمة المحلية
-        setAssistantAdmins(assistantAdmins.filter(admin => admin.email !== email));
-        
-        toast({
-          title: "تم الحذف بنجاح",
-          description: "تم حذف المشرف المساعد بنجاح",
-        });
-      } else {
-        throw new Error("User not found");
+      if (!adminToRemove || !adminToRemove.id) {
+        throw new Error("Admin not found or ID missing");
       }
+      
+      // Update role in profiles table
+      const { error: updateProfileError } = await supabase
+        .from('profiles')
+        .update({ role: 'user' })
+        .eq('id', adminToRemove.id);
+      
+      if (updateProfileError) throw updateProfileError;
+      
+      // Remove from local state
+      setAssistantAdmins(assistantAdmins.filter(admin => admin.email !== email));
+      
+      toast({
+        title: "تم الحذف بنجاح",
+        description: "تم حذف المشرف المساعد بنجاح",
+      });
     } catch (error) {
       console.error("Error removing admin:", error);
       toast({
