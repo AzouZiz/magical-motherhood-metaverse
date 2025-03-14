@@ -58,7 +58,7 @@ export const useAdmin = () => {
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
         
         if (profileError) {
           console.error("خطأ في الحصول على الملف الشخصي:", profileError);
@@ -110,21 +110,14 @@ export const useAdmin = () => {
             
             for (const admin of assistantsData) {
               try {
-                // الحصول على بريد المستخدم من auth.users
-                const { data: authUserData, error: authUserError } = await supabase
-                  .from('profiles')
-                  .select('*')
-                  .eq('id', admin.id)
-                  .single();
+                // الحصول على البريد الإلكتروني من auth.users
+                const { data: userData } = await supabase.auth.getUser(admin.id);
                   
-                if (authUserError) {
-                  console.error("خطأ في الحصول على بيانات المستخدم:", authUserError);
-                } else if (authUserData) {
-                  // استخدام البريد الإلكتروني من auth.users
+                if (userData?.user) {
                   adminsWithEmail.push({
                     id: admin.id,
                     name: admin.name || 'مساعد المشرف',
-                    email: session.user.email || '',
+                    email: userData.user.email || '',
                     role: 'helper'
                   });
                 }

@@ -69,18 +69,22 @@ const AdminLogin = () => {
   useEffect(() => {
     // التحقق مما إذا كان المستخدم مسجل دخوله بالفعل
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // التحقق من دور المستخدم
-        const { data } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-          
-        if (data && (data.role === 'super' || data.role === 'helper')) {
-          navigate('/admin');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // التحقق من دور المستخدم
+          const { data } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (data && (data.role === 'super' || data.role === 'helper')) {
+            navigate('/admin');
+          }
         }
+      } catch (error) {
+        console.error("فشل في التحقق من الجلسة:", error);
       }
     };
     
@@ -132,7 +136,7 @@ const AdminLogin = () => {
         .from('profiles')
         .select('role, name')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
         
       if (profileError) {
         console.error("خطأ في الحصول على ملف المستخدم:", profileError);
