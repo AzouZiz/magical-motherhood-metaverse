@@ -1,12 +1,12 @@
 
 import { Button } from "@/components/ui/button";
-import { Hero } from "@/components/Hero";
-import { Features } from "@/components/Features";
-import { CulturalSection } from "@/components/CulturalSection";
-import { ARSection } from "@/components/ARSection";
-import { PregnancyTracker } from "@/components/PregnancyTracker";
-import { CallToAction } from "@/components/CallToAction";
-import { Footer } from "@/components/Footer";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
+import CulturalSection from "@/components/CulturalSection";
+import ARSection from "@/components/ARSection";
+import PregnancyTracker from "@/components/PregnancyTracker";
+import CallToAction from "@/components/CallToAction";
+import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 import AdminWelcome from "@/components/AdminWelcome";
 import { useEffect, useState } from "react";
