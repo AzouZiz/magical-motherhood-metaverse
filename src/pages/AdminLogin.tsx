@@ -107,41 +107,57 @@ const AdminLogin = () => {
     setError(false);
 
     try {
+      console.log("محاولة تسجيل الدخول للمستخدم:", email);
+      
       // تسجيل الدخول باستخدام Supabase
       const { data, error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
-      if (loginError) throw loginError;
+      if (loginError) {
+        console.error("خطأ تسجيل الدخول:", loginError);
+        throw loginError;
+      }
       
-      if (data.user) {
-        // التحقق من دور المستخدم
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-          
-        if (profileError) throw profileError;
+      if (!data.user) {
+        console.error("لم يتم العثور على المستخدم");
+        throw new Error("User not found");
+      }
+      
+      console.log("تم تسجيل الدخول بنجاح، يتم التحقق من دور المستخدم");
+      
+      // التحقق من دور المستخدم
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role, name')
+        .eq('id', data.user.id)
+        .single();
         
-        // التحقق من أن المستخدم مشرف
-        if (profileData && (profileData.role === 'super' || profileData.role === 'helper')) {
-          // إظهار رسالة نجاح
-          toast({
-            title: language === 'ar' ? "تم تسجيل الدخول بنجاح" : "Login successful",
-            description: language === 'ar' 
-              ? "مرحبًا بك في لوحة تحكم كيدمام" 
-              : "Welcome to KidMam Admin Dashboard",
-          });
-          
-          // الانتقال إلى صفحة الإدارة
-          navigate('/admin');
-        } else {
-          // المستخدم ليس مشرفًا
-          await supabase.auth.signOut();
-          throw new Error("User is not an admin");
-        }
+      if (profileError) {
+        console.error("خطأ في الحصول على ملف المستخدم:", profileError);
+        throw profileError;
+      }
+      
+      console.log("بيانات الملف الشخصي:", profileData);
+      
+      // التحقق من أن المستخدم مشرف
+      if (profileData && (profileData.role === 'super' || profileData.role === 'helper')) {
+        // إظهار رسالة نجاح
+        toast({
+          title: language === 'ar' ? "تم تسجيل الدخول بنجاح" : "Login successful",
+          description: language === 'ar' 
+            ? `مرحبًا بك في لوحة تحكم كيدمام، ${profileData.name || ''}` 
+            : `Welcome to KidMam Admin Dashboard, ${profileData.name || ''}`,
+        });
+        
+        // الانتقال إلى صفحة الإدارة
+        navigate('/admin');
+      } else {
+        console.error("المستخدم ليس مشرفًا:", profileData);
+        // المستخدم ليس مشرفًا
+        await supabase.auth.signOut();
+        throw new Error("User is not an admin");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -149,8 +165,8 @@ const AdminLogin = () => {
       toast({
         title: language === 'ar' ? "خطأ في تسجيل الدخول" : "Login failed",
         description: language === 'ar' 
-          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" 
-          : "Invalid email or password",
+          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة أو ليس لديك صلاحيات المشرف" 
+          : "Invalid email or password, or you don't have admin privileges",
         variant: "destructive",
       });
     } finally {
