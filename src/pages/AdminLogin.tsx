@@ -77,7 +77,7 @@ const AdminLogin = () => {
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
             
           if (data && (data.role === 'super' || data.role === 'helper')) {
             navigate('/admin');
@@ -177,6 +177,13 @@ const AdminLogin = () => {
       setIsLoading(false);
     }
   };
+
+  // تحديث حقول تسجيل الدخول تلقائياً للتجربة السريعة
+  useEffect(() => {
+    // يمكن للمستخدم تغيير هذه القيم
+    setEmail('aaou2131@gmail.com');
+    setPassword('Admin@123');
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-kidmam-light/30 dark:bg-kidmam-dark/10 p-4">
