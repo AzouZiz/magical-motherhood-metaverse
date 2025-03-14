@@ -7,12 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-
-interface AdminUser {
-  name: string;
-  email: string;
-  role: 'super' | 'helper';
-}
+import { supabase, AdminUser, Profile } from '@/integrations/supabase/client';
 
 interface UserPermission {
   id: string;
@@ -21,7 +16,7 @@ interface UserPermission {
 }
 
 interface AdminsManagementProps {
-  adminUser: AdminUser | null;
+  adminUser: Profile | null;
   assistantAdmins: AdminUser[];
   setAssistantAdmins: React.Dispatch<React.SetStateAction<AdminUser[]>>;
   permissions: UserPermission[];
@@ -42,25 +37,70 @@ const AdminsManagement = ({
     password: '',
     role: 'helper'
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddAdmin = () => {
+  const handleAddAdmin = async () => {
     if (newAdmin.name && newAdmin.email && newAdmin.password) {
-      setAssistantAdmins([...assistantAdmins, {
-        name: newAdmin.name,
-        email: newAdmin.email,
-        role: 'helper' as 'helper'
-      }]);
+      setIsLoading(true);
       
+      try {
+        // 1. إنشاء حساب مستخدم جديد
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: newAdmin.email,
+          password: newAdmin.password,
+          options: {
+            data: {
+              name: newAdmin.name,
+              role: 'helper'
+            }
+          }
+        });
+        
+        if (signUpError) throw signUpError;
+        
+        if (signUpData.user) {
+          // 2. تحديث دور المستخدم في جدول الملفات الشخصية
+          const { error: updateProfileError } = await supabase
+            .from('profiles')
+            .update({ role: 'helper' })
+            .eq('id', signUpData.user.id);
+          
+          if (updateProfileError) throw updateProfileError;
+          
+          // 3. إضافة المشرف المساعد إلى القائمة المحلية
+          setAssistantAdmins([...assistantAdmins, {
+            name: newAdmin.name,
+            email: newAdmin.email,
+            role: 'helper' as 'helper'
+          }]);
+          
+          toast({
+            title: "تمت الإضافة بنجاح",
+            description: `تمت إضافة المشرف ${newAdmin.name} بنجاح`,
+          });
+          
+          setNewAdmin({
+            name: '',
+            email: '',
+            password: '',
+            role: 'helper'
+          });
+        }
+      } catch (error) {
+        console.error("Error adding admin:", error);
+        toast({
+          title: "خطأ في إضافة المشرف",
+          description: "حدث خطأ أثناء محاولة إضافة المشرف الجديد",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: `تمت إضافة المشرف ${newAdmin.name} بنجاح`,
-      });
-      
-      setNewAdmin({
-        name: '',
-        email: '',
-        password: '',
-        role: 'helper'
+        title: "حقول مطلوبة",
+        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: "destructive",
       });
     }
   };
@@ -71,12 +111,42 @@ const AdminsManagement = ({
     ));
   };
 
-  const removeAdmin = (email: string) => {
-    setAssistantAdmins(assistantAdmins.filter(admin => admin.email !== email));
-    toast({
-      title: "تم الحذف بنجاح",
-      description: "تم حذف المشرف المساعد بنجاح",
-    });
+  const removeAdmin = async (email: string) => {
+    try {
+      // 1. الحصول على معرف المستخدم من البريد الإلكتروني
+      const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
+      
+      if (userError) throw userError;
+      
+      const userToRemove = userData.users.find(user => user.email === email);
+      
+      if (userToRemove) {
+        // 2. تحديث دور المستخدم في جدول الملفات الشخصية
+        const { error: updateProfileError } = await supabase
+          .from('profiles')
+          .update({ role: 'user' })
+          .eq('id', userToRemove.id);
+        
+        if (updateProfileError) throw updateProfileError;
+        
+        // 3. إزالة المشرف المساعد من القائمة المحلية
+        setAssistantAdmins(assistantAdmins.filter(admin => admin.email !== email));
+        
+        toast({
+          title: "تم الحذف بنجاح",
+          description: "تم حذف المشرف المساعد بنجاح",
+        });
+      } else {
+        throw new Error("User not found");
+      }
+    } catch (error) {
+      console.error("Error removing admin:", error);
+      toast({
+        title: "خطأ في حذف المشرف",
+        description: "حدث خطأ أثناء محاولة حذف المشرف المساعد",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -146,7 +216,9 @@ const AdminsManagement = ({
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleAddAdmin}>إضافة مشرف</Button>
+              <Button onClick={handleAddAdmin} disabled={isLoading}>
+                {isLoading ? "جاري الإضافة..." : "إضافة مشرف"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -162,7 +234,7 @@ const AdminsManagement = ({
                 </div>
                 <div>
                   <div className="font-medium">{adminUser?.name || 'المشرف الرئيسي'}</div>
-                  <div className="text-sm text-gray-500">{adminUser?.email}</div>
+                  <div className="text-sm text-gray-500">{adminUser ? 'المدير' : ''}</div>
                 </div>
               </div>
               <div>

@@ -5,42 +5,86 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, LogOut } from 'lucide-react';
-
-interface AdminUser {
-  name: string;
-  email: string;
-  role: 'super' | 'helper';
-}
+import { supabase, Profile } from '@/integrations/supabase/client';
 
 const AdminWelcome = () => {
-  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // التحقق من وجود بيانات المشرف في localStorage
-    const storedUser = localStorage.getItem('adminUser');
+    const getProfile = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) throw sessionError;
+        
+        if (!session) {
+          setLoading(false);
+          return;
+        }
+        
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (error) throw error;
+        
+        setProfile(data as Profile);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setAdminUser(parsedUser);
-    }
+    getProfile();
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        setProfile(null);
+      } else {
+        getProfile();
+      }
+    });
+    
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminUser');
-    toast({
-      title: "تم تسجيل الخروج",
-      description: "تم تسجيل خروجك بنجاح",
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "تم تسجيل الخروج",
+        description: "تم تسجيل خروجك بنجاح",
+      });
+      navigate('/admin-login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "خطأ في تسجيل الخروج",
+        description: "حدث خطأ أثناء محاولة تسجيل الخروج",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAdminPanel = () => {
     navigate('/admin');
   };
 
-  if (!adminUser) {
+  if (loading) {
+    return <div>جاري التحميل...</div>;
+  }
+
+  if (!profile) {
     return null;
   }
 
@@ -52,14 +96,14 @@ const AdminWelcome = () => {
           مرحباً بك في لوحة التحكم
         </CardTitle>
         <CardDescription>
-          أنت مسجل دخولك كـ{adminUser.role === 'super' ? ' مشرف رئيسي' : ' مشرف مساعد'}
+          أنت مسجل دخولك كـ{profile.role === 'super' ? ' مشرف رئيسي' : ' مشرف مساعد'}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm">الاسم: {adminUser.name || 'المشرف'}</p>
-            <p className="text-sm">البريد الإلكتروني: {adminUser.email}</p>
+            <p className="text-sm">الاسم: {profile.name || 'المشرف'}</p>
+            <p className="text-sm">البريد الإلكتروني: {supabase.auth.getUser().then(({ data }) => data.user?.email)}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleAdminPanel}>

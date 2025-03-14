@@ -11,6 +11,7 @@ import AdminLogin from "./pages/AdminLogin";
 import VirtualWorld from "./pages/VirtualWorld";
 import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
+import AdminProtected from "./components/AdminProtected";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route 
+            path="/admin" 
+            element={
+              <AdminProtected>
+                <Admin />
+              </AdminProtected>
+            } 
+          />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/virtual-world" element={<VirtualWorld />} />
           <Route path="/community" element={<Community />} />

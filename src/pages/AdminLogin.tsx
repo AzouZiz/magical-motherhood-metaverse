@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Languages } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
 
 // مجموعة اللغات المتاحة
 const languages = [
@@ -67,57 +68,94 @@ const AdminLogin = () => {
 
   useEffect(() => {
     // التحقق مما إذا كان المستخدم مسجل دخوله بالفعل
-    const adminUser = localStorage.getItem('adminUser');
-    if (adminUser) {
-      navigate('/admin');
-    }
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // التحقق من دور المستخدم
+        const { data } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (data && (data.role === 'super' || data.role === 'helper')) {
+          navigate('/admin');
+        }
+      }
+    };
+    
+    checkSession();
   }, [navigate]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      toast({
+        title: language === 'ar' ? "حقول مطلوبة" : "Required fields",
+        description: language === 'ar' 
+          ? "يرجى إدخال البريد الإلكتروني وكلمة المرور" 
+          : "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setError(false);
 
-    // محاكاة عملية تسجيل الدخول
-    setTimeout(() => {
-      // التحقق من صحة بيانات الاعتماد
-      if (email === 'azeddinebeldjilali9@gmail.com' && password === 'Azou@21@Azou') {
-        // تخزين معلومات المستخدم المشرف
-        const adminUser = {
-          name: 'عزالدين بلجيلالي',
-          email: email,
-          role: 'super' as 'super' // المشرف الرئيسي
-        };
-        
-        localStorage.setItem('adminUser', JSON.stringify(adminUser));
-        
-        // إظهار رسالة نجاح
-        toast({
-          title: language === 'ar' ? "تم تسجيل الدخول بنجاح" : "Login successful",
-          description: language === 'ar' 
-            ? "مرحبًا بك في لوحة تحكم كيدمام" 
-            : "Welcome to KidMam Admin Dashboard",
-        });
-        
-        // الانتقال إلى صفحة الإدارة
-        navigate('/admin');
-      } else {
-        // إظهار رسالة خطأ
-        setError(true);
-        toast({
-          title: language === 'ar' ? "خطأ في تسجيل الدخول" : "Login failed",
-          description: language === 'ar' 
-            ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" 
-            : "Invalid email or password",
-          variant: "destructive",
-        });
-      }
+    try {
+      // تسجيل الدخول باستخدام Supabase
+      const { data, error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
       
+      if (loginError) throw loginError;
+      
+      if (data.user) {
+        // التحقق من دور المستخدم
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+          
+        if (profileError) throw profileError;
+        
+        // التحقق من أن المستخدم مشرف
+        if (profileData && (profileData.role === 'super' || profileData.role === 'helper')) {
+          // إظهار رسالة نجاح
+          toast({
+            title: language === 'ar' ? "تم تسجيل الدخول بنجاح" : "Login successful",
+            description: language === 'ar' 
+              ? "مرحبًا بك في لوحة تحكم كيدمام" 
+              : "Welcome to KidMam Admin Dashboard",
+          });
+          
+          // الانتقال إلى صفحة الإدارة
+          navigate('/admin');
+        } else {
+          // المستخدم ليس مشرفًا
+          await supabase.auth.signOut();
+          throw new Error("User is not an admin");
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setError(true);
+      toast({
+        title: language === 'ar' ? "خطأ في تسجيل الدخول" : "Login failed",
+        description: language === 'ar' 
+          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" 
+          : "Invalid email or password",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
