@@ -16,6 +16,7 @@ import DoctorAppointments from '@/components/DoctorAppointments';
 import VideoLibrary from '@/components/VideoLibrary';
 import PregnancyJournal from '@/components/PregnancyJournal';
 import LanguageTranslator from '@/components/LanguageTranslator';
+import PregnancyNotifications from '@/components/PregnancyNotifications';
 
 const Index = () => {
   return (
@@ -43,6 +44,7 @@ const Index = () => {
             </div>
             
             <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+              <PregnancyNotifications />
               <AIPregnancyAssistant />
               <NutritionGuide />
               <DoctorAppointments />
