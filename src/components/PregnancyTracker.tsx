@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Baby, Plus, Minus } from 'lucide-react';
+import { Baby, Plus, Minus, Cube } from 'lucide-react';
+import FetusThreedModel from './FetusThreedModel';
 
 const PregnancyTracker = () => {
   const [weekNumber, setWeekNumber] = useState(12);
+  const [showThreedModel, setShowThreedModel] = useState(false);
   const totalWeeks = 40;
   
   const increaseWeek = () => {
@@ -68,75 +70,105 @@ const PregnancyTracker = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Circular Progress */}
-              <div className="relative w-72 h-72 mx-auto">
-                <svg width="300" height="300" viewBox="0 0 100 100" className="transform -rotate-90">
-                  {/* Background Circle */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="rgba(226, 232, 240, 0.6)"
-                    strokeWidth="8"
-                  />
-                  {/* Progress Circle */}
-                  <motion.circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="url(#gradient)"
-                    strokeWidth="8"
-                    strokeDasharray="282.7"
-                    initial={{ strokeDashoffset: 282.7 }}
-                    animate={{ 
-                      strokeDashoffset: 282.7 - (282.7 * progressPercentage / 100) 
-                    }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
-                    strokeLinecap="round"
-                  />
-                  {/* Gradient Definition */}
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#9b6dff" />
-                      <stop offset="100%" stopColor="#4fd1c5" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                
-                {/* Center Content */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="relative">
-                    <motion.div
-                      key={weekNumber}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="mb-2"
+              {showThreedModel ? (
+                // عرض النموذج ثلاثي الأبعاد
+                <div className="mb-8">
+                  <FetusThreedModel weekNumber={weekNumber} className="min-h-[350px]" />
+                  <div className="mt-4 text-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowThreedModel(false)}
+                      className="text-kidmam-purple border-kidmam-purple/50 hover:bg-kidmam-purple/10"
                     >
-                      <span className="text-5xl font-bold gradient-text">{weekNumber}</span>
-                    </motion.div>
-                    <p className="text-muted-foreground text-sm">من أصل {totalWeeks} أسبوع</p>
-                    <p className="text-sm font-medium mt-2">الثلث {fetusDevelopment.trimester}</p>
+                      العودة إلى العرض التقليدي
+                    </Button>
                   </div>
                 </div>
-              </div>
-              
-              {/* Baby Icon with Animation */}
-              <motion.div 
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2"
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <div className="bg-white dark:bg-kidmam-dark p-4 rounded-full shadow-lg border border-kidmam-purple/30">
-                  <Baby className="h-8 w-8 text-kidmam-purple" />
-                </div>
-              </motion.div>
+              ) : (
+                // عرض المؤشر الدائري التقليدي
+                <>
+                  {/* Circular Progress */}
+                  <div className="relative w-72 h-72 mx-auto">
+                    <svg width="300" height="300" viewBox="0 0 100 100" className="transform -rotate-90">
+                      {/* Background Circle */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        fill="none"
+                        stroke="rgba(226, 232, 240, 0.6)"
+                        strokeWidth="8"
+                      />
+                      {/* Progress Circle */}
+                      <motion.circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        fill="none"
+                        stroke="url(#gradient)"
+                        strokeWidth="8"
+                        strokeDasharray="282.7"
+                        initial={{ strokeDashoffset: 282.7 }}
+                        animate={{ 
+                          strokeDashoffset: 282.7 - (282.7 * progressPercentage / 100) 
+                        }}
+                        transition={{ duration: 1, ease: "easeInOut" }}
+                        strokeLinecap="round"
+                      />
+                      {/* Gradient Definition */}
+                      <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#9b6dff" />
+                          <stop offset="100%" stopColor="#4fd1c5" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    
+                    {/* Center Content */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                      <div className="relative">
+                        <motion.div
+                          key={weekNumber}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                          className="mb-2"
+                        >
+                          <span className="text-5xl font-bold gradient-text">{weekNumber}</span>
+                        </motion.div>
+                        <p className="text-muted-foreground text-sm">من أصل {totalWeeks} أسبوع</p>
+                        <p className="text-sm font-medium mt-2">الثلث {fetusDevelopment.trimester}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Baby Icon with Animation */}
+                  <motion.div 
+                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2"
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <div className="bg-white dark:bg-kidmam-dark p-4 rounded-full shadow-lg border border-kidmam-purple/30">
+                      <Baby className="h-8 w-8 text-kidmam-purple" />
+                    </div>
+                  </motion.div>
+                  
+                  {/* زر عرض النموذج ثلاثي الأبعاد */}
+                  <div className="text-center mt-24">
+                    <Button
+                      onClick={() => setShowThreedModel(true)}
+                      className="bg-gradient-to-r from-kidmam-purple to-kidmam-teal text-white"
+                    >
+                      <Cube className="h-4 w-4 mr-2" />
+                      عرض نموذج ثلاثي الأبعاد
+                    </Button>
+                  </div>
+                </>
+              )}
             </motion.div>
             
             {/* Week Controls */}
-            <div className="mt-16 max-w-md mx-auto">
+            <div className="mt-8 max-w-md mx-auto">
               <div className="flex items-center justify-between mb-4">
                 <Button 
                   variant="outline" 
