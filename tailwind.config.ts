@@ -91,6 +91,9 @@ const config = {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },
           "50%": { opacity: "0.8", transform: "scale(1.05)" },
         },
+        "shimmer": {
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -98,6 +101,7 @@ const config = {
         "pulse-gentle": "pulse-gentle 3s infinite ease-in-out",
         "pulse-fast": "pulse-fast 0.7s infinite ease-in-out",
         "pulse-slow": "pulse-slow 2s infinite ease-in-out",
+        "shimmer": "shimmer 2s infinite linear",
       },
     },
   },
