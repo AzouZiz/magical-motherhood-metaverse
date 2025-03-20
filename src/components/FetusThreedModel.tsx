@@ -1,4 +1,3 @@
-
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, useHelper, Html, Text } from '@react-three/drei';
@@ -14,10 +13,13 @@ import {
   Info,
   Home,
   SunMoon,
-  Lightbulb
+  Lightbulb,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Slider } from '@/components/ui/slider';
 
 interface FetusModelProps {
   weekNumber: number;
@@ -191,13 +193,78 @@ interface FetusThreedModelProps {
   className?: string;
 }
 
+// Utility function to calculate heartbeat rate based on week number
+const getHeartbeatRate = (weekNumber: number): number => {
+  // Heart rate starts high in early pregnancy and gradually decreases
+  // - Early pregnancy (weeks 5-9): 170-180 bpm
+  // - Mid-pregnancy (weeks 9-13): 150-170 bpm
+  // - After week 13: stabilizes around 130-150 bpm
+  if (weekNumber < 9) {
+    return 175 - (weekNumber - 5) * 2.5; // Gradually decrease from ~175 bpm
+  } else if (weekNumber < 13) {
+    return 160 - (weekNumber - 9) * 2.5; // Gradually decrease from ~160 bpm
+  } else {
+    return 140; // Stabilize around 140 bpm
+  }
+};
+
 const FetusThreedModel = ({ weekNumber, className = "" }: FetusThreedModelProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isRotating, setIsRotating] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 5]);
   const [advancedLighting, setAdvancedLighting] = useState(true);
+  const [heartbeatPlaying, setHeartbeatPlaying] = useState(false);
+  const [heartbeatVolume, setHeartbeatVolume] = useState(80);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // إنشاء عنصر الصوت
+  useEffect(() => {
+    // إنشاء الصوت فقط عند التركيب الأولي
+    audioRef.current = new Audio('/heartbeat.mp3');
+    audioRef.current.loop = true;
+    
+    // التنظيف عند إزالة المكون
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+  
+  // تحديث معدل ضربات القلب حسب أسبوع الحمل
+  useEffect(() => {
+    if (audioRef.current) {
+      // تغيير معدل التشغيل بناءً على أسبوع الحمل
+      const heartRate = getHeartbeatRate(weekNumber);
+      const playbackRate = heartRate / 140; // معدل تشغيل نسبي إلى معدل 140 نبضة/دقيقة
+      audioRef.current.playbackRate = playbackRate;
+      
+      // تحديث مستوى الصوت
+      audioRef.current.volume = heartbeatVolume / 100;
+    }
+  }, [weekNumber, heartbeatVolume]);
+  
+  // تبديل تشغيل/إيقاف الصوت
+  useEffect(() => {
+    if (audioRef.current) {
+      if (heartbeatPlaying) {
+        audioRef.current.play().catch(e => console.error("خطأ في تشغيل الصوت:", e));
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [heartbeatPlaying]);
+  
+  // تغيير مستوى الصوت
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = heartbeatVolume / 100;
+    }
+  }, [heartbeatVolume]);
   
   // زوم للكاميرا
   const zoomIn = () => {
@@ -290,6 +357,7 @@ const FetusThreedModel = ({ weekNumber, className = "" }: FetusThreedModelProps)
               </Tooltip>
             </TooltipProvider>
             
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -380,6 +448,50 @@ const FetusThreedModel = ({ weekNumber, className = "" }: FetusThreedModelProps)
               </Tooltip>
             </TooltipProvider>
             
+            {/* زر نبضات القلب */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="bg-transparent backdrop-blur-sm border-white/20 text-white hover:bg-white/10"
+                    onClick={() => setHeartbeatPlaying(!heartbeatPlaying)}
+                  >
+                    {heartbeatPlaying ? (
+                      <Volume2 className="h-4 w-4 text-kidmam-gold animate-pulse-slow" />
+                    ) : (
+                      <VolumeX className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>{heartbeatPlaying ? 'إيقاف نبضات القلب' : 'تشغيل نبضات القلب'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            {/* زر قائمة مستوى الصوت */}
+            {heartbeatPlaying && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="bg-transparent backdrop-blur-sm border-white/20 text-white hover:bg-white/10"
+                      onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+                    >
+                      <span className="text-xs text-kidmam-gold font-bold">{heartbeatVolume}%</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>ضبط مستوى الصوت</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -404,10 +516,38 @@ const FetusThreedModel = ({ weekNumber, className = "" }: FetusThreedModelProps)
         </Card>
       </div>
       
-      {/* المؤشر للمعلومات */}
+      {/* المنزلق لضبط مستوى الصوت */}
+      {showVolumeSlider && heartbeatPlaying && (
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-20 bg-black/70 backdrop-blur-md p-4 rounded-lg w-72">
+          <p className="text-white text-xs mb-2 text-center">مستوى صوت نبضات القلب</p>
+          <div className="flex items-center gap-2">
+            <VolumeX className="h-4 w-4 text-white" />
+            <Slider
+              value={[heartbeatVolume]}
+              min={0}
+              max={100}
+              step={5}
+              onValueChange={(values) => setHeartbeatVolume(values[0])}
+              className="flex-1"
+            />
+            <Volume2 className="h-4 w-4 text-white" />
+          </div>
+          <p className="text-white text-xs mt-2 text-center">
+            معدل النبض: {Math.round(getHeartbeatRate(weekNumber))} نبضة في الدقيقة
+          </p>
+        </div>
+      )}
+      
+      {/* معلومات الجنين في الأعلى */}
       <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center">
         <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium inline-block">
           الجنين في الأسبوع {weekNumber}
+          {heartbeatPlaying && (
+            <span className="mr-2 inline-flex items-center">
+              <span className="inline-block h-2 w-2 rounded-full bg-kidmam-gold animate-pulse-fast mr-1"></span>
+              {Math.round(getHeartbeatRate(weekNumber))} نبضة/دقيقة
+            </span>
+          )}
         </div>
         
         {/* إعلان "اسحب للتدوير" */}
@@ -415,6 +555,24 @@ const FetusThreedModel = ({ weekNumber, className = "" }: FetusThreedModelProps)
           اسحب للتدوير • استخدم عجلة الماوس للتكبير
         </div>
       </div>
+      
+      {/* تأثير بصري لنبضات القلب */}
+      {heartbeatPlaying && (
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <motion.div 
+            className="absolute w-full h-full border-kidmam-gold/20 border-[15px] rounded-full"
+            animate={{ 
+              scale: [1, 1.05, 1], 
+              opacity: [0.5, 0.3, 0.5] 
+            }}
+            transition={{ 
+              duration: 60 / getHeartbeatRate(weekNumber),
+              repeat: Infinity,
+              ease: "easeInOut" 
+            }}
+          />
+        </div>
+      )}
     </motion.div>
   );
 };
