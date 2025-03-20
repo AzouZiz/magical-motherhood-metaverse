@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Baby, Plus, Minus, Cube } from 'lucide-react';
+import { Baby, Plus, Minus, Box } from 'lucide-react';
 import FetusThreedModel from './FetusThreedModel';
 
 const PregnancyTracker = () => {
@@ -24,7 +23,6 @@ const PregnancyTracker = () => {
     }
   };
 
-  // Simulated data for fetus development
   const getFetusDevelopment = (week: number) => {
     const developmentStages = {
       size: week < 10 ? `${week * 0.5} سم` : `${Math.min(50, week * 1.2)} سم`,
@@ -42,12 +40,10 @@ const PregnancyTracker = () => {
   
   const fetusDevelopment = getFetusDevelopment(weekNumber);
   
-  // Calculate progress percentage
   const progressPercentage = (weekNumber / totalWeeks) * 100;
 
   return (
     <section className="py-16 relative overflow-hidden bg-background">
-      {/* Background Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-kidmam-teal/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-kidmam-purple/10 rounded-full blur-3xl"></div>
       
@@ -62,7 +58,6 @@ const PregnancyTracker = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Visual Representation */}
           <div className="order-2 lg:order-1">
             <motion.div 
               className="relative"
@@ -71,7 +66,6 @@ const PregnancyTracker = () => {
               transition={{ duration: 0.5 }}
             >
               {showThreedModel ? (
-                // عرض النموذج ثلاثي الأبعاد
                 <div className="mb-8">
                   <FetusThreedModel weekNumber={weekNumber} className="min-h-[350px]" />
                   <div className="mt-4 text-center">
@@ -85,12 +79,9 @@ const PregnancyTracker = () => {
                   </div>
                 </div>
               ) : (
-                // عرض المؤشر الدائري التقليدي
                 <>
-                  {/* Circular Progress */}
                   <div className="relative w-72 h-72 mx-auto">
                     <svg width="300" height="300" viewBox="0 0 100 100" className="transform -rotate-90">
-                      {/* Background Circle */}
                       <circle
                         cx="50"
                         cy="50"
@@ -99,7 +90,6 @@ const PregnancyTracker = () => {
                         stroke="rgba(226, 232, 240, 0.6)"
                         strokeWidth="8"
                       />
-                      {/* Progress Circle */}
                       <motion.circle
                         cx="50"
                         cy="50"
@@ -115,7 +105,6 @@ const PregnancyTracker = () => {
                         transition={{ duration: 1, ease: "easeInOut" }}
                         strokeLinecap="round"
                       />
-                      {/* Gradient Definition */}
                       <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                           <stop offset="0%" stopColor="#9b6dff" />
@@ -124,7 +113,6 @@ const PregnancyTracker = () => {
                       </defs>
                     </svg>
                     
-                    {/* Center Content */}
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                       <div className="relative">
                         <motion.div
@@ -142,7 +130,6 @@ const PregnancyTracker = () => {
                     </div>
                   </div>
                   
-                  {/* Baby Icon with Animation */}
                   <motion.div 
                     className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2"
                     animate={{ y: [0, -5, 0] }}
@@ -153,13 +140,12 @@ const PregnancyTracker = () => {
                     </div>
                   </motion.div>
                   
-                  {/* زر عرض النموذج ثلاثي الأبعاد */}
                   <div className="text-center mt-24">
                     <Button
                       onClick={() => setShowThreedModel(true)}
                       className="bg-gradient-to-r from-kidmam-purple to-kidmam-teal text-white"
                     >
-                      <Cube className="h-4 w-4 mr-2" />
+                      <Box className="h-4 w-4 mr-2" />
                       عرض نموذج ثلاثي الأبعاد
                     </Button>
                   </div>
@@ -167,7 +153,6 @@ const PregnancyTracker = () => {
               )}
             </motion.div>
             
-            {/* Week Controls */}
             <div className="mt-8 max-w-md mx-auto">
               <div className="flex items-center justify-between mb-4">
                 <Button 
@@ -207,7 +192,6 @@ const PregnancyTracker = () => {
             </div>
           </div>
           
-          {/* Development Information */}
           <div className="order-1 lg:order-2">
             <Card className="glass-card">
               <CardContent className="pt-6">
@@ -226,7 +210,6 @@ const PregnancyTracker = () => {
                     </p>
                   </motion.div>
                   
-                  {/* Key Stats */}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <motion.div
                       key={`size-${weekNumber}`}
@@ -251,7 +234,6 @@ const PregnancyTracker = () => {
                     </motion.div>
                   </div>
                   
-                  {/* Development Highlights */}
                   <div>
                     <h4 className="font-medium mb-3">أبرز التطورات</h4>
                     <ul className="space-y-2">
@@ -270,7 +252,6 @@ const PregnancyTracker = () => {
                     </ul>
                   </div>
                   
-                  {/* Call to Action */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
