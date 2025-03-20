@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
@@ -41,6 +42,20 @@ const PregnancyTracker = () => {
   const fetusDevelopment = getFetusDevelopment(weekNumber);
   
   const progressPercentage = (weekNumber / totalWeeks) * 100;
+
+  // تحديد صورة الجنين المناسبة حسب الأسبوع
+  const getFetalImage = (week: number) => {
+    if (week <= 4) return "/images/fetus-week-4.jpg";
+    if (week <= 8) return "/images/fetus-week-8.jpg";
+    if (week <= 10) return "/images/fetus-week-10.jpg";
+    if (week <= 12) return "/images/fetus-week-12.jpg";
+    if (week <= 16) return "/images/fetus-week-16.jpg";
+    if (week <= 20) return "/images/fetus-week-20.jpg";
+    if (week <= 24) return "/images/fetus-week-24.jpg";
+    if (week <= 28) return "/images/fetus-week-28.jpg";
+    if (week <= 32) return "/images/fetus-week-32.jpg";
+    return "/images/fetus-week-40.jpg";
+  };
 
   return (
     <section className="py-16 relative overflow-hidden bg-background">
@@ -114,31 +129,24 @@ const PregnancyTracker = () => {
                     </svg>
                     
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <div className="relative">
-                        <motion.div
-                          key={weekNumber}
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.3 }}
-                          className="mb-2"
-                        >
-                          <span className="text-5xl font-bold gradient-text">{weekNumber}</span>
-                        </motion.div>
-                        <p className="text-muted-foreground text-sm">من أصل {totalWeeks} أسبوع</p>
-                        <p className="text-sm font-medium mt-2">الثلث {fetusDevelopment.trimester}</p>
-                      </div>
+                      {/* صورة الجنين داخل الدائرة بدلا من الأيقونة */}
+                      <motion.div
+                        key={weekNumber}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="rounded-full overflow-hidden w-40 h-40 mx-auto mb-2 bg-white/90 p-1 border border-kidmam-purple/30 shadow-lg"
+                      >
+                        <img 
+                          src={getFetalImage(weekNumber)} 
+                          alt={`جنين في الأسبوع ${weekNumber}`} 
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      </motion.div>
+                      <p className="text-muted-foreground text-sm">الأسبوع {weekNumber} من أصل {totalWeeks} أسبوع</p>
+                      <p className="text-sm font-medium mt-2">الثلث {fetusDevelopment.trimester}</p>
                     </div>
                   </div>
-                  
-                  <motion.div 
-                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2"
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <div className="bg-white dark:bg-kidmam-dark p-4 rounded-full shadow-lg border border-kidmam-purple/30">
-                      <Baby className="h-8 w-8 text-kidmam-purple" />
-                    </div>
-                  </motion.div>
                   
                   <div className="text-center mt-24">
                     <Button

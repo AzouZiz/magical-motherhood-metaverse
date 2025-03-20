@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, Html, Text, useGLTF, Sphere } from '@react-three/drei';
@@ -29,6 +30,7 @@ interface FetusModelProps {
   showDetails?: boolean;
 }
 
+// 获取胎儿发育信息
 const getFetusDevelopmentInfo = (weekNumber: number) => {
   if (weekNumber < 8) {
     return "في هذه المرحلة المبكرة، يكون حجم الجنين صغيراً جداً وتبدأ الأعضاء الداخلية في التكون.";
@@ -41,6 +43,20 @@ const getFetusDevelopmentInfo = (weekNumber: number) => {
   } else {
     return "في هذه المرحلة النهائية، يكون الجنين مكتمل النمو تقريباً ويستعد للولادة.";
   }
+};
+
+// تحديد صورة الجنين المناسبة حسب الأسبوع
+const getFetalImage = (week: number) => {
+  if (week <= 4) return "/images/fetus-week-4.jpg";
+  if (week <= 8) return "/images/fetus-week-8.jpg";
+  if (week <= 10) return "/images/fetus-week-10.jpg";
+  if (week <= 12) return "/images/fetus-week-12.jpg";
+  if (week <= 16) return "/images/fetus-week-16.jpg";
+  if (week <= 20) return "/images/fetus-week-20.jpg";
+  if (week <= 24) return "/images/fetus-week-24.jpg";
+  if (week <= 28) return "/images/fetus-week-28.jpg";
+  if (week <= 32) return "/images/fetus-week-32.jpg";
+  return "/images/fetus-week-40.jpg";
 };
 
 const Womb = ({ children, weekNumber }: { children: React.ReactNode, weekNumber: number }) => {
@@ -209,62 +225,12 @@ const Bubble = ({ position, scale, speed }: { position: [number, number, number]
   );
 };
 
-const DefaultFetus = ({ weekNumber, position = [0, 0, 0], scale = 1, showDetails = false }: FetusModelProps) => {
+// مكون الجنين باستخدام صور واقعية
+const RealisticFetus = ({ weekNumber, position = [0, 0, 0], scale = 1, showDetails = false }: FetusModelProps) => {
   const meshRef = useRef<Mesh>(null);
   
   const fetusScale = 0.2 + (weekNumber / 40) * 0.8;
   
-  const color = weekNumber < 12 
-    ? '#ffb6c1' 
-    : weekNumber < 28 
-      ? '#e8beac' 
-      : '#d4a592';
-  
-  const getGeometry = () => {
-    if (weekNumber < 8) {
-      return (
-        <sphereGeometry args={[0.8, 32, 32]} />
-      );
-    } else if (weekNumber < 16) {
-      return (
-        <capsuleGeometry args={[0.6, 1.2, 16, 32]} />
-      );
-    } else {
-      return (
-        <group>
-          <mesh position={[0, -0.1, 0]}>
-            <capsuleGeometry args={[0.5, 1.2, 16, 32]} />
-            <meshStandardMaterial color={color} />
-          </mesh>
-          <mesh position={[0, 0.8, 0]}>
-            <sphereGeometry args={[0.4, 32, 32]} />
-            <meshStandardMaterial color={color} />
-          </mesh>
-          {weekNumber >= 20 && (
-            <>
-              <mesh position={[0.6, 0.2, 0]} rotation={[0, 0, -Math.PI / 4]}>
-                <capsuleGeometry args={[0.15, 0.6, 16, 32]} />
-                <meshStandardMaterial color={color} />
-              </mesh>
-              <mesh position={[-0.6, 0.2, 0]} rotation={[0, 0, Math.PI / 4]}>
-                <capsuleGeometry args={[0.15, 0.6, 16, 32]} />
-                <meshStandardMaterial color={color} />
-              </mesh>
-              <mesh position={[0.3, -0.7, 0]} rotation={[0, 0, Math.PI / 16]}>
-                <capsuleGeometry args={[0.15, 0.7, 16, 32]} />
-                <meshStandardMaterial color={color} />
-              </mesh>
-              <mesh position={[-0.3, -0.7, 0]} rotation={[0, 0, -Math.PI / 16]}>
-                <capsuleGeometry args={[0.15, 0.7, 16, 32]} />
-                <meshStandardMaterial color={color} />
-              </mesh>
-            </>
-          )}
-        </group>
-      );
-    }
-  };
-
   useFrame(({ clock }) => {
     if (meshRef.current) {
       meshRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.2;
@@ -280,22 +246,28 @@ const DefaultFetus = ({ weekNumber, position = [0, 0, 0], scale = 1, showDetails
 
   return (
     <>
-      <mesh
+      <group
         ref={meshRef}
         position={position}
         scale={[fetusScale * scale, fetusScale * scale, fetusScale * scale]}
-        castShadow
-        receiveShadow
       >
-        {getGeometry()}
-        <meshPhysicalMaterial 
-          color={color} 
-          roughness={0.7} 
-          metalness={0.1}
-          clearcoat={0.3}
-          clearcoatRoughness={0.25}
-        />
-      </mesh>
+        {/* استخدام الصورة في مستوي ثلاثي الأبعاد */}
+        <mesh>
+          <planeGeometry args={[2, 2]} />
+          <meshBasicMaterial 
+            transparent
+            map={null}
+            attach="material"
+            onUpdate={(self) => {
+              const loader = new THREE.TextureLoader();
+              loader.load(getFetalImage(weekNumber), (texture) => {
+                self.map = texture;
+                self.needsUpdate = true;
+              });
+            }}
+          />
+        </mesh>
+      </group>
 
       {showDetails && (
         <Html position={[0, 2, 0]} center distanceFactor={10}>
@@ -499,13 +471,13 @@ const FetusThreedModel = ({ weekNumber, className = "" }: FetusThreedModelProps)
         {showVRView ? (
           <>
             <Womb weekNumber={weekNumber}>
-              <DefaultFetus weekNumber={weekNumber} showDetails={showDetails} />
+              <RealisticFetus weekNumber={weekNumber} showDetails={showDetails} />
             </Womb>
             <AmnioticBubbles />
             <MedicalMarkers weekNumber={weekNumber} />
           </>
         ) : (
-          <DefaultFetus weekNumber={weekNumber} showDetails={showDetails} />
+          <RealisticFetus weekNumber={weekNumber} showDetails={showDetails} />
         )}
         
         <ContactShadows position={[0, -2, 0]} opacity={0.5} scale={10} blur={1.5} far={4} />
