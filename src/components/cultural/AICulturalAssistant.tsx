@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip } from "@/components/ui/tooltip";
-import { TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider, TooltipTrigger, TooltipContent, Tooltip } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCultural } from "@/contexts/CulturalContext";
@@ -58,13 +57,13 @@ const suggestedQuestions = [
 // Simulated response generation
 const generateResponse = (question: string): Message => {
   // Simulate AI processing
-  const hasQuran = question.includes("دعاء") || question.includes("أدعية") || question.includes("قرآن");
-  const hasHadith = question.includes("حديث") || question.includes("السنة") || question.includes("النبي");
-  const isMedical = question.includes("صحة") || 
-                    question.includes("طبي") || 
-                    question.includes("مرض") ||
-                    question.includes("ألم") ||
-                    question.includes("دواء");
+  let hasQuran = question.includes("دعاء") || question.includes("أدعية") || question.includes("قرآن");
+  let hasHadith = question.includes("حديث") || question.includes("السنة") || question.includes("النبي");
+  let isMedical = question.includes("صحة") || 
+                  question.includes("طبي") || 
+                  question.includes("مرض") ||
+                  question.includes("ألم") ||
+                  question.includes("دواء");
   
   let response = "";
   let sources: string[] = [];
@@ -402,3 +401,4 @@ export function AICulturalAssistant() {
     </div>
   );
 }
+
