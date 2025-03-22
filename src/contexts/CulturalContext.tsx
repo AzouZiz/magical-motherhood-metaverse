@@ -1,125 +1,163 @@
 
-import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 
-// Types for our cultural context
-export type MadhhabType = 'hanafi' | 'maliki' | 'shafi' | 'hanbali' | 'unspecified';
-export type RegionType = 'gulf' | 'levant' | 'north-africa' | 'general';
-export type ModestyLevelType = 1 | 2 | 3 | 4 | 5;
-export type DialectType = 'MSA' | 'Egyptian' | 'Gulf' | 'Levantine' | 'Maghrebi';
+// Define types
+type RegionType = 'gulf' | 'levant' | 'north-africa' | 'egypt' | 'global';
+type ModestyLevelType = 1 | 2 | 3 | 4 | 5;
+type DirectionType = 'rtl' | 'ltr';
 
+// Cultural context type definition
 interface CulturalContextType {
-  direction: 'rtl' | 'ltr';
+  direction: DirectionType;
   locale: string;
   modestyLevel: ModestyLevelType;
   religiousPreference: 'conservative' | 'moderate' | 'liberal';
   region: RegionType;
-  madhhab: MadhhabType;
-  dialect: DialectType;
   setLocale: (locale: string) => void;
   setModestyLevel: (level: ModestyLevelType) => void;
-  setReligiousPreference: (pref: 'conservative' | 'moderate' | 'liberal') => void;
+  setReligiousPreference: (preference: 'conservative' | 'moderate' | 'liberal') => void;
   setRegion: (region: RegionType) => void;
-  setMadhhab: (madhhab: MadhhabType) => void;
-  setDialect: (dialect: DialectType) => void;
+  formatDate: (date: Date) => string;
+  formatCurrency: (amount: number) => string;
+  translate: (key: string) => string;
   theme: {
     colors: {
       primary: string;
       secondary: string;
       accent: string;
-      halal: string;
-      haram: string;
+      background: string;
+      text: string;
+    };
+    patterns: {
+      primary: string;
+      secondary: string;
     };
   };
 }
 
-// Create the cultural context with default values
-const CulturalContext = createContext<CulturalContextType | undefined>(undefined);
-
-// Color generator based on preferences
-const generateCulturalColors = (modestyLevel: ModestyLevelType, religiousPreference: string) => {
-  // Adjust color saturation based on modesty level
-  const primaryColors = {
-    conservative: {
-      primary: '#6b5f9a', // More subdued purple
-      secondary: '#3ab4a6', // Subdued teal
-      accent: '#c0935c', // Subdued gold
+// Create the context with a default value
+export const CulturalContext = createContext<CulturalContextType>({
+  direction: 'rtl',
+  locale: 'ar',
+  modestyLevel: 3,
+  religiousPreference: 'moderate',
+  region: 'gulf',
+  setLocale: () => {},
+  setModestyLevel: () => {},
+  setReligiousPreference: () => {},
+  setRegion: () => {},
+  formatDate: () => '',
+  formatCurrency: () => '',
+  translate: () => '',
+  theme: {
+    colors: {
+      primary: '#9b6dff',
+      secondary: '#4fd1c5',
+      accent: '#ffd166',
+      background: '#ffffff',
+      text: '#333333',
     },
-    moderate: {
-      primary: '#9b87f5', // Standard purple
-      secondary: '#3fc2b5', // Standard teal
-      accent: '#d4af37', // Standard gold
+    patterns: {
+      primary: 'url(/patterns/arab-pattern.svg)',
+      secondary: 'linear-gradient(45deg, rgba(155, 109, 255, 0.1), rgba(79, 209, 197, 0.1))',
     },
-    liberal: {
-      primary: '#ad97ff', // Vibrant purple
-      secondary: '#40d9ca', // Vibrant teal
-      accent: '#ffc857', // Vibrant gold
-    }
-  };
-
-  // Religious color indicators
-  const religiousColors = {
-    halal: religiousPreference === 'conservative' ? '#2e7d32' : '#66BB6A',
-    haram: religiousPreference === 'conservative' ? '#c62828' : '#EF5350',
-  };
-
-  return {
-    ...primaryColors[religiousPreference as keyof typeof primaryColors],
-    ...religiousColors
-  };
-};
+  },
+});
 
 // Provider component
-export const CulturalProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+export const CulturalProvider = ({ children }: { children: ReactNode }) => {
   const [locale, setLocale] = useState<string>('ar');
   const [modestyLevel, setModestyLevel] = useState<ModestyLevelType>(3);
   const [religiousPreference, setReligiousPreference] = useState<'conservative' | 'moderate' | 'liberal'>('moderate');
-  const [region, setRegion] = useState<RegionType>('general');
-  const [madhhab, setMadhhab] = useState<MadhhabType>('unspecified');
-  const [dialect, setDialect] = useState<DialectType>('MSA');
+  const [region, setRegion] = useState<RegionType>('gulf');
 
-  // Memoize the colors to avoid recalculating on every render
-  const colors = useMemo(
-    () => generateCulturalColors(modestyLevel, religiousPreference),
-    [modestyLevel, religiousPreference]
-  );
+  // Derived direction based on locale
+  const direction: DirectionType = locale === 'ar' ? 'rtl' : 'ltr';
 
-  // Memoize the full context value
-  const contextValue = useMemo(
-    () => ({
-      direction: locale === 'ar' ? 'rtl' : 'ltr',
-      locale,
-      modestyLevel,
-      religiousPreference,
-      region,
-      madhhab,
-      dialect,
-      setLocale,
-      setModestyLevel,
-      setReligiousPreference,
-      setRegion,
-      setMadhhab,
-      setDialect,
-      theme: {
-        colors
-      }
-    }),
-    [locale, modestyLevel, religiousPreference, region, madhhab, dialect, colors]
-  );
+  // Format date according to locale and cultural preferences
+  const formatDate = (date: Date): string => {
+    if (locale === 'ar') {
+      // Here you might implement Hijri date conversion
+      return new Intl.DateTimeFormat('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }).format(date);
+    }
+    
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date);
+  };
+
+  // Format currency according to region
+  const formatCurrency = (amount: number): string => {
+    const currencies: Record<RegionType, string> = {
+      'gulf': 'SAR',
+      'levant': 'JOD',
+      'north-africa': 'MAD',
+      'egypt': 'EGP',
+      'global': 'USD',
+    };
+
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currencies[region],
+    }).format(amount);
+  };
+
+  // Simple translation function (would be more sophisticated in a real app)
+  const translate = (key: string): string => {
+    // Placeholder for translation logic
+    return key;
+  };
+
+  // Theme values based on cultural preferences
+  const theme = useMemo(() => {
+    // Adjust colors based on modesty level and religious preference
+    const primaryColor = modestyLevel > 3 ? '#7559cc' : '#9b6dff';
+    const secondaryColor = religiousPreference === 'conservative' ? '#2c7a7b' : '#4fd1c5';
+    
+    return {
+      colors: {
+        primary: primaryColor,
+        secondary: secondaryColor,
+        accent: '#ffd166',
+        background: '#ffffff',
+        text: '#333333',
+      },
+      patterns: {
+        primary: 'url(/patterns/arab-pattern.svg)',
+        secondary: 'linear-gradient(45deg, rgba(155, 109, 255, 0.1), rgba(79, 209, 197, 0.1))',
+      },
+    };
+  }, [modestyLevel, religiousPreference]);
+
+  // Value object for the context
+  const contextValue: CulturalContextType = {
+    direction,
+    locale,
+    modestyLevel,
+    religiousPreference,
+    region,
+    setLocale,
+    setModestyLevel,
+    setReligiousPreference,
+    setRegion,
+    formatDate,
+    formatCurrency,
+    translate,
+    theme,
+  };
 
   return (
     <CulturalContext.Provider value={contextValue}>
-      <div dir={contextValue.direction} className={`cultural-root ${locale}`}>
-        {children}
-      </div>
+      {children}
     </CulturalContext.Provider>
   );
 };
 
 // Custom hook for using the cultural context
-export const useCultural = () => {
-  const context = useContext(CulturalContext);
-  if (context === undefined) {
-    throw new Error('useCultural must be used within a CulturalProvider');
-  }
-  return context;
-};
+export const useCultural = () => useContext(CulturalContext);

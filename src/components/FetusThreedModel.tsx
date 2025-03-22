@@ -1,8 +1,7 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Text, Environment, SpotLight } from '@react-three/drei';
-import { TextureLoader, DoubleSide } from 'three';
+import { TextureLoader, DoubleSide, Color } from 'three';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
 
@@ -39,8 +38,6 @@ const FetusByWeek = ({ week, showInWomb }: { week: number, showInWomb: boolean }
 
 // This creates a womb-like environment
 const WombModel = () => {
-  const texture = useLoader(TextureLoader, '/textures/womb-texture.jpg');
-  
   return (
     <group>
       {/* Outer womb wall */}
@@ -77,7 +74,6 @@ const WombModel = () => {
         <meshStandardMaterial 
           color="#AA0114" 
           roughness={1}
-          map={texture} 
         />
       </mesh>
       
