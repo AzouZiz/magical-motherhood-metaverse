@@ -155,12 +155,12 @@ const FetalModel = ({ week, scale, color, showInWomb }: { week: number, scale: n
     if (showInWomb) {
       // In later weeks, the fetus is more likely to be in head-down position
       if (week > 30) {
-        return [0, -0.5, 0];
+        return [0, -0.5, 0] as [number, number, number];
       } else {
-        return [0, 0, 0];
+        return [0, 0, 0] as [number, number, number];
       }
     } else {
-      return [0, 0, 0];
+      return [0, 0, 0] as [number, number, number];
     }
   };
   
@@ -383,7 +383,7 @@ const Scene = ({ week, showInWomb }: { week: number, showInWomb: boolean }) => {
       {showInWomb && (
         <>
           <Text
-            position={[-2, 2, 0]}
+            position={[-2, 2, 0] as [number, number, number]}
             color="#e056fd"
             fontSize={0.2}
             anchorX="left"
@@ -392,7 +392,7 @@ const Scene = ({ week, showInWomb }: { week: number, showInWomb: boolean }) => {
             Fetal Heart Rate: {vitalSigns.heartRate} BPM
           </Text>
           <Text
-            position={[-2, 1.7, 0]}
+            position={[-2, 1.7, 0] as [number, number, number]}
             color="#e056fd"
             fontSize={0.2}
             anchorX="left"
@@ -401,7 +401,7 @@ const Scene = ({ week, showInWomb }: { week: number, showInWomb: boolean }) => {
             Week: {week}
           </Text>
           <Text
-            position={[-2, 1.4, 0]}
+            position={[-2, 1.4, 0] as [number, number, number]}
             color="#e056fd"
             fontSize={0.2}
             anchorX="left"
