@@ -17,6 +17,8 @@ import VideoLibrary from '@/components/VideoLibrary';
 import PregnancyJournal from '@/components/PregnancyJournal';
 import LanguageTranslator from '@/components/LanguageTranslator';
 import PregnancyNotifications from '@/components/PregnancyNotifications';
+import { AICulturalAssistant } from '@/components/cultural/AICulturalAssistant';
+import { IslamicPattern } from '@/components/cultural/IslamicPatterns';
 
 const Index = () => {
   return (
@@ -33,6 +35,7 @@ const Index = () => {
             <p className="text-gray-600 max-w-2xl mx-auto">
               مجموعة من الأدوات المتقدمة التي تساعدك على متابعة مرحلة الحمل بدقة وتوفر لك معلومات قيمة ودعم مستمر
             </p>
+            <IslamicPattern type="divider" className="max-w-md mx-auto mt-4" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -53,6 +56,22 @@ const Index = () => {
         </div>
       </section>
       
+      {/* المساعد الثقافي الذكي */}
+      <section className="py-16 bg-gradient-to-b from-kidmam-light/20 to-white relative overflow-hidden">
+        <IslamicPattern type="background" className="absolute inset-0 opacity-10" />
+        <div className="container mx-auto px-4 relative">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-kidmam-dark mb-4 font-amiri">المساعد الثقافي الذكي</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              مساعد ذكي يجمع بين المعرفة الطبية والثقافية ليقدم لك إجابات تناسب احتياجاتك ضمن إطار القيم والعادات العربية
+            </p>
+            <IslamicPattern type="divider" className="max-w-md mx-auto mt-4" />
+          </div>
+          
+          <AICulturalAssistant />
+        </div>
+      </section>
+      
       {/* قسم الموارد التعليمية */}
       <section className="py-16 bg-gradient-to-b from-kidmam-light/20 to-white">
         <div className="container mx-auto px-4">
@@ -61,6 +80,7 @@ const Index = () => {
             <p className="text-gray-600 max-w-2xl mx-auto">
               محتوى تعليمي غني وأدوات مفيدة لمساعدتك خلال رحلة الحمل والاستعداد للأمومة
             </p>
+            <IslamicPattern type="divider" className="max-w-md mx-auto mt-4" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
