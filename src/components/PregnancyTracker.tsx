@@ -4,12 +4,17 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Baby, Plus, Minus, Box } from 'lucide-react';
+import { Baby, Plus, Minus, Box, Eye, EyeOff } from 'lucide-react';
+import { Toggle } from "@/components/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import FetusThreedModel from './FetusThreedModel';
 
 const PregnancyTracker = () => {
   const [weekNumber, setWeekNumber] = useState(12);
   const [showThreedModel, setShowThreedModel] = useState(false);
+  const [viewMode, setViewMode] = useState<'realistic' | '3d'>('realistic');
+  const [visualizationView, setVisualizationView] = useState<'fetus' | 'womb'>('fetus');
   const totalWeeks = 40;
   
   const increaseWeek = () => {
@@ -33,10 +38,36 @@ const PregnancyTracker = () => {
         week < 20 ? "تطور الدماغ والجهاز العصبي" : "نمو الشعر والأظافر",
         week > 25 ? "تطور الرئتين والجهاز التنفسي" : "تشكل ملامح الوجه"
       ],
-      trimester: week <= 13 ? "الأول" : week <= 26 ? "الثاني" : "الثالث"
+      trimester: week <= 13 ? "الأول" : week <= 26 ? "الثاني" : "الثالث",
+      description: getWeekDescription(week)
     };
     
     return developmentStages;
+  };
+
+  // Get detailed description for each week
+  const getWeekDescription = (week: number) => {
+    const descriptions: Record<number, string> = {
+      4: "يبدأ قلب الجنين في النبض وتتشكل الأعضاء الأساسية مثل الدماغ والعمود الفقري.",
+      8: "يكتمل تشكل جميع الأعضاء الرئيسية، ويمكن ملاحظة حركة صغيرة للأطراف.",
+      12: "يمكن للجنين أن يغلق أصابعه ويفتحها، كما تظهر ملامح الوجه بشكل أوضح.",
+      16: "يكتمل نمو الأعضاء التناسلية ويمكن تحديد جنس الجنين، تظهر بصمات الأصابع.",
+      20: "يمكن للأم الشعور بحركة الجنين، ويتطور نظام السمع لدى الجنين.",
+      24: "تتكون الرئتين وتتطور، ويستطيع الجنين فتح عينيه والإستجابة للأصوات الخارجية.",
+      28: "يستطيع الجنين التنفس ولديه فرصة للبقاء على قيد الحياة في حالة الولادة المبكرة.",
+      32: "يزداد نمو الدماغ بسرعة، ويزداد وزن الجنين بشكل كبير.",
+      36: "يكتمل نمو الرئتين، ويستعد الجنين للولادة.",
+      40: "الجنين مكتمل النمو ومستعد للولادة."
+    };
+    
+    // Find the closest week in the descriptions
+    const closestWeek = Object.keys(descriptions)
+      .map(w => parseInt(w))
+      .reduce((prev, curr) => 
+        Math.abs(curr - week) < Math.abs(prev - week) ? curr : prev
+      );
+      
+    return descriptions[closestWeek];
   };
   
   const fetusDevelopment = getFetusDevelopment(weekNumber);
@@ -80,13 +111,51 @@ const PregnancyTracker = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              {showThreedModel ? (
+              <div className="flex justify-center gap-3 mb-6">
+                <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'realistic' | '3d')}>
+                  <ToggleGroupItem value="realistic" className="px-4">
+                    واقعي
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="3d" className="px-4">
+                    ثلاثي الأبعاد
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+              
+              {viewMode === '3d' ? (
                 <div className="mb-8">
-                  <FetusThreedModel weekNumber={weekNumber} className="min-h-[350px]" />
+                  <div className="flex justify-center mb-4">
+                    <RadioGroup 
+                      className="flex flex-row gap-4" 
+                      defaultValue="fetus"
+                      value={visualizationView}
+                      onValueChange={(value) => setVisualizationView(value as 'fetus' | 'womb')}
+                    >
+                      <div className="flex items-center space-x-2 space-x-reverse">
+                        <RadioGroupItem value="fetus" id="fetus" />
+                        <label htmlFor="fetus" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          الجنين فقط
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2 space-x-reverse">
+                        <RadioGroupItem value="womb" id="womb" />
+                        <label htmlFor="womb" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          داخل الرحم
+                        </label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                
+                  <FetusThreedModel 
+                    weekNumber={weekNumber} 
+                    className="min-h-[350px]" 
+                    showInWomb={visualizationView === 'womb'}
+                  />
+                  
                   <div className="mt-4 text-center">
                     <Button
                       variant="outline"
-                      onClick={() => setShowThreedModel(false)}
+                      onClick={() => setViewMode('realistic')}
                       className="text-kidmam-purple border-kidmam-purple/50 hover:bg-kidmam-purple/10"
                     >
                       العودة إلى العرض التقليدي
@@ -129,7 +198,6 @@ const PregnancyTracker = () => {
                     </svg>
                     
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      {/* صورة الجنين داخل الدائرة بدلا من الأيقونة */}
                       <motion.div
                         key={weekNumber}
                         initial={{ scale: 0.8, opacity: 0 }}
@@ -150,7 +218,7 @@ const PregnancyTracker = () => {
                   
                   <div className="text-center mt-24">
                     <Button
-                      onClick={() => setShowThreedModel(true)}
+                      onClick={() => setViewMode('3d')}
                       className="bg-gradient-to-r from-kidmam-purple to-kidmam-teal text-white"
                     >
                       <Box className="h-4 w-4 mr-2" />
@@ -214,7 +282,7 @@ const PregnancyTracker = () => {
                       طفلك في الأسبوع {weekNumber}
                     </h3>
                     <p className="text-muted-foreground mb-6">
-                      تعرفي على تطور طفلك وما يحدث في هذه المرحلة من الحمل
+                      {fetusDevelopment.description}
                     </p>
                   </motion.div>
                   
