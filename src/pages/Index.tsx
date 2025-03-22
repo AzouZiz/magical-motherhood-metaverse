@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
@@ -19,34 +19,83 @@ import LanguageTranslator from '@/components/LanguageTranslator';
 import PregnancyNotifications from '@/components/PregnancyNotifications';
 import { AICulturalAssistant } from '@/components/cultural/AICulturalAssistant';
 import { IslamicPattern } from '@/components/cultural/IslamicPatterns';
+import MoodTracker from '@/components/MoodTracker';
+import { motion } from 'framer-motion';
 
 const Index = () => {
+  // Setup fade-on-scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const elements = document.querySelectorAll('.fade-on-scroll');
+      elements.forEach(el => {
+        const rect = (el as HTMLElement).getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+        if (isVisible) {
+          (el as HTMLElement).style.opacity = '1';
+          (el as HTMLElement).style.transform = 'translateY(0)';
+        } else {
+          (el as HTMLElement).style.opacity = '0.7';
+          (el as HTMLElement).style.transform = 'translateY(20px)';
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-soothing-gradient">
       <Navbar />
       <Hero />
       <Features />
       
+      {/* Mood Tracker Section */}
+      <section className="py-12 bg-calm-pattern relative overflow-hidden">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="max-w-md mx-auto"
+          >
+            <MoodTracker />
+          </motion.div>
+        </div>
+      </section>
+      
       {/* أدوات متابعة الحمل الذكية */}
-      <section id="pregnancy-tools" className="py-16 bg-gradient-to-b from-white to-kidmam-light/20">
+      <section id="pregnancy-tools" className="py-16 bg-gradient-to-b from-white to-soothing-lightPurple/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-kidmam-dark mb-4">أدوات متابعة الحمل الذكية</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <motion.h2 
+              className="text-3xl font-bold text-kidmam-dark mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              أدوات متابعة الحمل الذكية
+            </motion.h2>
+            <motion.p 
+              className="text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               مجموعة من الأدوات المتقدمة التي تساعدك على متابعة مرحلة الحمل بدقة وتوفر لك معلومات قيمة ودعم مستمر
-            </p>
+            </motion.p>
             <IslamicPattern type="divider" className="max-w-md mx-auto mt-4" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="space-y-8 fade-on-scroll" style={{ animationDelay: '0.2s' }}>
               <PregnancyTracker />
               <PregnancyInsightsDashboard />
               <MothersSupport />
               <PregnancyJournal />
             </div>
             
-            <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <div className="space-y-8 fade-on-scroll" style={{ animationDelay: '0.4s' }}>
               <PregnancyNotifications />
               <AIPregnancyAssistant />
               <NutritionGuide />
@@ -57,35 +106,79 @@ const Index = () => {
       </section>
       
       {/* المساعد الثقافي الذكي */}
-      <section className="py-16 bg-gradient-to-b from-kidmam-light/20 to-white relative overflow-hidden">
+      <section className="py-16 bg-gradient-to-b from-soothing-lightPurple/20 to-white relative overflow-hidden">
         <IslamicPattern type="background" className="absolute inset-0 opacity-10" />
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-kidmam-dark mb-4 font-amiri">المساعد الثقافي الذكي</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <motion.h2 
+              className="text-3xl font-bold text-kidmam-dark mb-4 font-amiri"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              المساعد الثقافي الذكي
+            </motion.h2>
+            <motion.p 
+              className="text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               مساعد ذكي يجمع بين المعرفة الطبية والثقافية ليقدم لك إجابات تناسب احتياجاتك ضمن إطار القيم والعادات العربية
-            </p>
+            </motion.p>
             <IslamicPattern type="divider" className="max-w-md mx-auto mt-4" />
           </div>
           
-          <AICulturalAssistant />
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
+            <AICulturalAssistant />
+          </motion.div>
         </div>
       </section>
       
       {/* قسم الموارد التعليمية */}
-      <section className="py-16 bg-gradient-to-b from-kidmam-light/20 to-white">
+      <section className="py-16 bg-gradient-to-b from-soothing-lightPurple/20 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-kidmam-dark mb-4">موارد تعليمية وأدوات مساعدة</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <motion.h2 
+              className="text-3xl font-bold text-kidmam-dark mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              موارد تعليمية وأدوات مساعدة
+            </motion.h2>
+            <motion.p 
+              className="text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               محتوى تعليمي غني وأدوات مفيدة لمساعدتك خلال رحلة الحمل والاستعداد للأمومة
-            </p>
+            </motion.p>
             <IslamicPattern type="divider" className="max-w-md mx-auto mt-4" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <VideoLibrary />
-            <LanguageTranslator />
+            <motion.div 
+              className="fade-on-scroll"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+            >
+              <VideoLibrary />
+            </motion.div>
+            <motion.div 
+              className="fade-on-scroll"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+            >
+              <LanguageTranslator />
+            </motion.div>
           </div>
         </div>
       </section>

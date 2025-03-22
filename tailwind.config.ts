@@ -58,11 +58,19 @@ const config = {
         },
         kidmam: {
           rose: "#ff6384",
-          purple: "#a67af4",
-          teal: "#4fd1c5",
-          gold: "#ffc857",
+          purple: "#B39DDB", // Updated to a softer purple
+          teal: "#80CBC4", // Updated to a more soothing teal
+          gold: "#FFD54F", // Updated to a warmer gold
           dark: "#1f2937",
           light: "#f8fafc",
+        },
+        soothing: {
+          purple: "#B39DDB",
+          teal: "#80CBC4",
+          gold: "#FFD54F",
+          overlay: "rgba(255, 255, 255, 0.9)",
+          lightPurple: "#F3E5F5",
+          lightBlue: "#E1F5FE",
         },
       },
       borderRadius: {
@@ -94,6 +102,18 @@ const config = {
         "shimmer": {
           "100%": { backgroundPosition: "200% 0" },
         },
+        "breathing": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.015)" },
+        },
+        "soft-bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "subtle-flow": {
+          "0%": { backgroundPosition: "0% 0%" },
+          "100%": { backgroundPosition: "100% 100%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -102,6 +122,13 @@ const config = {
         "pulse-fast": "pulse-fast 0.7s infinite ease-in-out",
         "pulse-slow": "pulse-slow 2s infinite ease-in-out",
         "shimmer": "shimmer 2s infinite linear",
+        "breathing": "breathing 6s infinite ease-in-out",
+        "soft-bounce": "soft-bounce 3s infinite ease-in-out",
+        "subtle-flow": "subtle-flow 20s infinite linear",
+      },
+      backgroundImage: {
+        "soothing-gradient": "linear-gradient(145deg, #E1F5FE 0%, #F3E5F5 100%)",
+        "calm-pattern": "radial-gradient(circle at 10% 20%, #F3E5F5 0%, transparent 30%), repeating-linear-gradient(45deg, rgba(179, 157, 219, 0.05) 0px, rgba(179, 157, 219, 0.05) 2px, transparent 2px, transparent 8px)",
       },
     },
   },

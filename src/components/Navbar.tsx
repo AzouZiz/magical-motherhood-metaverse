@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { MoonIcon, SunIcon, MenuIcon, XIcon } from 'lucide-react';
+import { MoonIcon, SunIcon, MenuIcon, XIcon, Wind } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +13,7 @@ export default function Navbar() {
     return localStorage.getItem('theme') === 'dark' || 
       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
+  const [isCalm, setIsCalm] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,8 +42,29 @@ export default function Navbar() {
     }
   }, [isDarkMode]);
 
+  useEffect(() => {
+    // Add keyboard shortcut for calm mode (Ctrl/Cmd + Alt + H)
+    const handleKeydown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'h') {
+        toggleCalmMode();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [isCalm]);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleCalmMode = () => {
+    setIsCalm(!isCalm);
+    document.body.classList.toggle('calm-mode');
+    toast({
+      title: isCalm ? "تم إلغاء الوضع الهادئ" : "تم تفعيل الوضع الهادئ",
+      description: isCalm ? "تم استعادة الألوان والعناصر إلى وضعها الطبيعي" : "تم تخفيت الألوان والعناصر البصرية",
+    });
   };
 
   const toggleMenu = () => {
@@ -64,13 +86,24 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-background/80 backdrop-blur-md border-b border-muted/30 sticky top-0 z-50 w-full transition-colors duration-300">
+    <motion.nav 
+      className="floating-navbar sticky top-0 z-50 w-full"
+      initial={{ y: -10, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex-1 flex items-center justify-start">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="font-amiri text-2xl font-bold text-kidmam-purple">كيدمام</span>
+              <motion.span 
+                className="font-amiri text-2xl font-bold text-soothing-purple"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                كيدمام
+              </motion.span>
             </Link>
           </div>
 
@@ -78,8 +111,8 @@ export default function Navbar() {
           <div className="hidden md:flex md:items-center md:space-x-6 rtl:space-x-reverse">
             <Link 
               to="/" 
-              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-kidmam-purple ${
-                location.pathname === '/' ? 'text-kidmam-purple' : 'text-foreground/70'
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors gentle-glow ${
+                location.pathname === '/' ? 'text-soothing-purple' : 'text-foreground/70'
               }`}
               onClick={handleLinkClick}
             >
@@ -87,8 +120,8 @@ export default function Navbar() {
             </Link>
             <Link 
               to="/virtual-world" 
-              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-kidmam-purple ${
-                location.pathname === '/virtual-world' ? 'text-kidmam-purple' : 'text-foreground/70'
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors gentle-glow ${
+                location.pathname === '/virtual-world' ? 'text-soothing-purple' : 'text-foreground/70'
               }`}
               onClick={handleLinkClick}
             >
@@ -96,8 +129,8 @@ export default function Navbar() {
             </Link>
             <Link 
               to="/community" 
-              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-kidmam-purple ${
-                location.pathname === '/community' ? 'text-kidmam-purple' : 'text-foreground/70'
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors gentle-glow ${
+                location.pathname === '/community' ? 'text-soothing-purple' : 'text-foreground/70'
               }`}
               onClick={handleLinkClick}
             >
@@ -105,8 +138,8 @@ export default function Navbar() {
             </Link>
             <Link 
               to="/profile" 
-              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-kidmam-purple ${
-                location.pathname === '/profile' ? 'text-kidmam-purple' : 'text-foreground/70'
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors gentle-glow ${
+                location.pathname === '/profile' ? 'text-soothing-purple' : 'text-foreground/70'
               }`}
               onClick={handleLinkClick}
             >
@@ -117,8 +150,8 @@ export default function Navbar() {
             {isAdmin && (
               <Link 
                 to="/admin" 
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-kidmam-purple ${
-                  location.pathname === '/admin' ? 'text-kidmam-purple' : 'text-foreground/70'
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors gentle-glow ${
+                  location.pathname === '/admin' ? 'text-soothing-purple' : 'text-foreground/70'
                 }`}
                 onClick={handleLinkClick}
               >
@@ -129,6 +162,16 @@ export default function Navbar() {
 
           {/* Call to Action and Theme Toggle */}
           <div className="flex items-center space-x-4 rtl:space-x-reverse flex-1 justify-end">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleCalmMode}
+              className="rounded-full"
+              aria-label={isCalm ? "إلغاء الوضع الهادئ" : "تفعيل الوضع الهادئ"}
+            >
+              <Wind className={`h-[1.2rem] w-[1.2rem] transition-all ${isCalm ? 'text-soothing-teal' : 'text-muted-foreground'}`} />
+            </Button>
+            
             <Button 
               variant="ghost" 
               size="icon" 
@@ -145,7 +188,7 @@ export default function Navbar() {
             
             <Button 
               onClick={handleLoginClick}
-              className="bg-kidmam-purple hover:bg-kidmam-purple/90 text-white hidden md:block"
+              className="bg-soothing-purple hover:bg-soothing-purple/90 text-white hidden md:block transition-all duration-200 active:scale-[0.98]"
             >
               دخول
             </Button>
@@ -182,7 +225,7 @@ export default function Navbar() {
               <Link 
                 to="/" 
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === '/' ? 'text-kidmam-purple bg-kidmam-purple/10' : 'text-foreground/70'
+                  location.pathname === '/' ? 'text-soothing-purple bg-soothing-purple/10' : 'text-foreground/70'
                 }`}
                 onClick={handleLinkClick}
               >
@@ -191,7 +234,7 @@ export default function Navbar() {
               <Link 
                 to="/virtual-world" 
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === '/virtual-world' ? 'text-kidmam-purple bg-kidmam-purple/10' : 'text-foreground/70'
+                  location.pathname === '/virtual-world' ? 'text-soothing-purple bg-soothing-purple/10' : 'text-foreground/70'
                 }`}
                 onClick={handleLinkClick}
               >
@@ -200,7 +243,7 @@ export default function Navbar() {
               <Link 
                 to="/community" 
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === '/community' ? 'text-kidmam-purple bg-kidmam-purple/10' : 'text-foreground/70'
+                  location.pathname === '/community' ? 'text-soothing-purple bg-soothing-purple/10' : 'text-foreground/70'
                 }`}
                 onClick={handleLinkClick}
               >
@@ -209,7 +252,7 @@ export default function Navbar() {
               <Link 
                 to="/profile" 
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === '/profile' ? 'text-kidmam-purple bg-kidmam-purple/10' : 'text-foreground/70'
+                  location.pathname === '/profile' ? 'text-soothing-purple bg-soothing-purple/10' : 'text-foreground/70'
                 }`}
                 onClick={handleLinkClick}
               >
@@ -221,7 +264,7 @@ export default function Navbar() {
                 <Link 
                   to="/admin" 
                   className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    location.pathname === '/admin' ? 'text-kidmam-purple bg-kidmam-purple/10' : 'text-foreground/70'
+                    location.pathname === '/admin' ? 'text-soothing-purple bg-soothing-purple/10' : 'text-foreground/70'
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -231,7 +274,7 @@ export default function Navbar() {
 
               <Button 
                 onClick={handleLoginClick}
-                className="bg-kidmam-purple hover:bg-kidmam-purple/90 text-white w-full mt-4"
+                className="bg-soothing-purple hover:bg-soothing-purple/90 text-white w-full mt-4"
               >
                 دخول
               </Button>
@@ -239,6 +282,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </motion.nav>
   );
 }

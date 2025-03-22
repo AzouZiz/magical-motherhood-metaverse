@@ -45,6 +45,10 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* New soothing variables */
+    --calm-overlay: rgba(255, 255, 255, 0.9);
+    --adaptive-brightness: 1;
   }
 
   .dark {
@@ -75,6 +79,9 @@
     --border: 280 20% 20%;
     --input: 280 20% 20%;
     --ring: 270 100% 72%;
+
+    /* Dark mode soothing variables */
+    --calm-overlay: rgba(31, 41, 55, 0.9);
   }
 }
 
@@ -104,18 +111,47 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-kidmam-purple to-kidmam-teal bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-soothing-purple to-soothing-teal bg-clip-text text-transparent;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-kidmam-purple to-kidmam-teal text-white font-bold py-3 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1;
+    @apply bg-gradient-to-r from-soothing-purple to-soothing-teal text-white font-bold py-3 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 active:scale-[0.96] active:shadow-sm;
   }
 
   .btn-secondary {
-    @apply bg-gradient-to-r from-kidmam-gold to-kidmam-rose text-white font-bold py-3 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1;
+    @apply bg-gradient-to-r from-soothing-gold to-kidmam-rose text-white font-bold py-3 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 active:scale-[0.96] active:shadow-sm;
   }
 
   .shimmer {
     @apply bg-gradient-to-r from-transparent via-white/30 to-transparent bg-[length:500px_100%] animate-shimmer;
+  }
+
+  /* New UI components */
+  .breathing-card {
+    @apply bg-white/95 dark:bg-kidmam-dark/95 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-gradient-to-br hover:from-white hover:to-soothing-lightPurple/30 dark:hover:from-kidmam-dark dark:hover:to-soothing-purple/10;
+  }
+  
+  .floating-navbar {
+    @apply backdrop-blur-md bg-soothing-overlay border border-soothing-purple/10 transition-all duration-300;
+  }
+  
+  .gentle-glow {
+    @apply hover:text-soothing-purple hover:shadow-[0_0_15px_-3px] hover:shadow-soothing-purple/20 transition-all duration-300;
+  }
+  
+  .dynamic-background {
+    @apply bg-calm-pattern animate-subtle-flow;
+  }
+  
+  .fade-on-scroll {
+    @apply transition-all duration-300;
+  }
+  
+  .mood-option {
+    @apply text-2xl cursor-pointer p-2 rounded-full hover:bg-soothing-purple/10 transition-all duration-200 hover:scale-110 active:scale-90;
+  }
+  
+  .calm-mode {
+    @apply opacity-90 brightness-[var(--adaptive-brightness)];
   }
 }

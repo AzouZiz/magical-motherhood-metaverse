@@ -5,31 +5,35 @@ import { Baby, Heart, Star, Award } from 'lucide-react';
 
 const CallToAction = () => {
   return (
-    <section className="py-16 relative overflow-hidden">
+    <section className="py-16 relative overflow-hidden dynamic-background">
       {/* Background Glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-kidmam-purple/20 via-transparent to-kidmam-teal/20"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-soothing-purple/20 via-transparent to-soothing-teal/20"></div>
       
       {/* Decoration Elements */}
       <motion.div 
-        className="absolute -top-10 -left-10 w-40 h-40 bg-kidmam-purple/10 rounded-full blur-xl"
+        className="absolute -top-10 -left-10 w-40 h-40 bg-soothing-purple/10 rounded-full blur-xl"
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute -bottom-10 -right-10 w-40 h-40 bg-kidmam-teal/10 rounded-full blur-xl"
+        className="absolute -bottom-10 -right-10 w-40 h-40 bg-soothing-teal/10 rounded-full blur-xl"
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
       
       <div className="container mx-auto px-4 relative z-10">
         {/* Main Content */}
-        <div className="glass-card max-w-4xl mx-auto text-center py-12 px-4 md:px-12 rounded-2xl overflow-hidden relative">
+        <motion.div 
+          className="breathing-card max-w-4xl mx-auto text-center py-12 px-4 md:px-12 rounded-2xl overflow-hidden relative"
+          animate={{ scale: [1, 1.015, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        >
           {/* Shimmer Effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent shimmer"></div>
           
           {/* Floating Icons */}
           <motion.div 
-            className="absolute top-5 left-10 text-kidmam-purple/40"
+            className="absolute top-5 left-10 text-soothing-purple/40"
             animate={{ y: [-5, 5, -5], rotate: [0, 10, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -37,7 +41,7 @@ const CallToAction = () => {
           </motion.div>
           
           <motion.div 
-            className="absolute bottom-5 right-10 text-kidmam-teal/40"
+            className="absolute bottom-5 right-10 text-soothing-teal/40"
             animate={{ y: [-5, 5, -5], rotate: [0, -10, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
           >
@@ -45,7 +49,7 @@ const CallToAction = () => {
           </motion.div>
           
           <motion.div 
-            className="absolute top-10 right-20 text-kidmam-gold/40"
+            className="absolute top-10 right-20 text-soothing-gold/40"
             animate={{ y: [-4, 4, -4], rotate: [0, 15, 0] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           >
@@ -72,28 +76,28 @@ const CallToAction = () => {
             
             {/* Features */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-kidmam-purple/10 flex items-center justify-center mx-auto mb-3">
-                  <Baby className="h-6 w-6 text-kidmam-purple" />
+              <div className="text-center fade-on-scroll">
+                <div className="w-12 h-12 rounded-full bg-soothing-purple/10 flex items-center justify-center mx-auto mb-3">
+                  <Baby className="h-6 w-6 text-soothing-purple" />
                 </div>
                 <h3 className="font-medium">تقنية متطورة</h3>
               </div>
               
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-kidmam-teal/10 flex items-center justify-center mx-auto mb-3">
-                  <Heart className="h-6 w-6 text-kidmam-teal" />
+              <div className="text-center fade-on-scroll">
+                <div className="w-12 h-12 rounded-full bg-soothing-teal/10 flex items-center justify-center mx-auto mb-3">
+                  <Heart className="h-6 w-6 text-soothing-teal" />
                 </div>
                 <h3 className="font-medium">رعاية شاملة</h3>
               </div>
               
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-kidmam-gold/10 flex items-center justify-center mx-auto mb-3">
-                  <Star className="h-6 w-6 text-kidmam-gold" />
+              <div className="text-center fade-on-scroll">
+                <div className="w-12 h-12 rounded-full bg-soothing-gold/10 flex items-center justify-center mx-auto mb-3">
+                  <Star className="h-6 w-6 text-soothing-gold" />
                 </div>
                 <h3 className="font-medium">تجربة فريدة</h3>
               </div>
               
-              <div className="text-center">
+              <div className="text-center fade-on-scroll">
                 <div className="w-12 h-12 rounded-full bg-kidmam-rose/10 flex items-center justify-center mx-auto mb-3">
                   <Award className="h-6 w-6 text-kidmam-rose" />
                 </div>
@@ -106,12 +110,12 @@ const CallToAction = () => {
               <Button size="lg" className="btn-primary">
                 سجلي الآن مجانًا
               </Button>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="hover:bg-soothing-teal/5 active:scale-[0.98]">
                 عرض الخطط والأسعار
               </Button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
