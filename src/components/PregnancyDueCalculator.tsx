@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { format, addDays, addWeeks, subWeeks, differenceInDays, isValid, parseISO } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -6,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Calendar as CalendarIcon, AlertCircle, Calendar, Baby } from 'lucide-react';
+import { Calendar as CalendarIcon, AlertCircle, CalendarDays, Baby } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -67,7 +66,7 @@ const PregnancyDueCalculator = () => {
         date: subWeeks(calculatedDueDate, 27),
         description: "نهاية 13 أسبوع من الحمل",
         weeks: "13",
-        icon: <Calendar className="h-4 w-4 text-kidmam-gold/80" />,
+        icon: <CalendarDays className="h-4 w-4 text-kidmam-gold/80" />,
         color: "bg-kidmam-gold/10 text-kidmam-gold border-kidmam-gold/20"
       },
       {
@@ -75,7 +74,7 @@ const PregnancyDueCalculator = () => {
         date: subWeeks(calculatedDueDate, 14),
         description: "نهاية 26 أسبوع من الحمل",
         weeks: "26",
-        icon: <Calendar className="h-4 w-4 text-kidmam-rose/80" />,
+        icon: <CalendarDays className="h-4 w-4 text-kidmam-rose/80" />,
         color: "bg-kidmam-rose/10 text-kidmam-rose border-kidmam-rose/20"
       },
       {
@@ -205,13 +204,14 @@ const PregnancyDueCalculator = () => {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={lmpDate || undefined}
+                    selected={lmpDate}
                     onSelect={(date) => {
                       setLmpDate(date);
                       setIsDatePickerOpen(false);
                     }}
                     disabled={(date) => date > new Date()}
                     initialFocus
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -231,10 +231,11 @@ const PregnancyDueCalculator = () => {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={conceptionDate || undefined}
-                    onSelect={setConceptionDate}
+                    selected={conceptionDate}
+                    onSelect={(date) => setConceptionDate(date)}
                     disabled={(date) => date > new Date()}
                     initialFocus
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -254,10 +255,11 @@ const PregnancyDueCalculator = () => {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={ultrasoundDate || undefined}
-                    onSelect={setUltrasoundDate}
+                    selected={ultrasoundDate}
+                    onSelect={(date) => setUltrasoundDate(date)}
                     disabled={(date) => date > new Date()}
                     initialFocus
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -342,3 +344,4 @@ const PregnancyDueCalculator = () => {
 };
 
 export default PregnancyDueCalculator;
+
