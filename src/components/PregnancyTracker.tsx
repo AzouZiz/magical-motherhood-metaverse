@@ -4,11 +4,12 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Baby, Plus, Minus, Box, Eye, EyeOff } from 'lucide-react';
+import { Baby, Plus, Minus, Box, Eye, EyeOff, Info } from 'lucide-react';
 import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import FetusThreedModel from './FetusThreedModel';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const PregnancyTracker = () => {
   const [weekNumber, setWeekNumber] = useState(12);
@@ -89,7 +90,7 @@ const PregnancyTracker = () => {
   };
 
   return (
-    <section className="py-16 relative overflow-hidden bg-background">
+    <section className="py-16 relative overflow-hidden bg-background" id="pregnancy-tracker">
       <div className="absolute top-0 right-0 w-64 h-64 bg-kidmam-teal/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-kidmam-purple/10 rounded-full blur-3xl"></div>
       
@@ -124,6 +125,13 @@ const PregnancyTracker = () => {
               
               {viewMode === '3d' ? (
                 <div className="mb-8">
+                  <Alert className="mb-4 bg-kidmam-teal/10 text-kidmam-teal border-kidmam-teal/20">
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      هذا نموذج توضيحي فقط. للحصول على نماذج واقعية أكثر، سيتم إضافة نماذج مصممة بدقة بواسطة خبراء في المستقبل.
+                    </AlertDescription>
+                  </Alert>
+
                   <div className="flex justify-center mb-4">
                     <RadioGroup 
                       className="flex flex-row gap-4" 
@@ -152,7 +160,10 @@ const PregnancyTracker = () => {
                     showInWomb={visualizationView === 'womb'}
                   />
                   
-                  <div className="mt-4 text-center">
+                  <div className="mt-4 text-center space-y-4">
+                    <p className="text-muted-foreground text-sm">
+                      هذا نموذج تقريبي. النماذج الأكثر واقعية تتطلب نماذج ثلاثية الأبعاد مصممة احترافيًا.
+                    </p>
                     <Button
                       variant="outline"
                       onClick={() => setViewMode('realistic')}
