@@ -5,115 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipProvider, TooltipTrigger, TooltipContent, Tooltip } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCultural } from "@/contexts/CulturalContext";
 import { Mic, Send, Info, VolumeX, Volume2, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { IslamicPattern } from './IslamicPatterns';
-
-// Message types
-type MessageRole = 'user' | 'assistant';
-
-interface Message {
-  id: string;
-  content: string;
-  role: MessageRole;
-  timestamp: Date;
-  sources?: string[];
-  hasQuran?: boolean;
-  hasHadith?: boolean;
-  isMedical?: boolean;
-}
-
-// Suggested questions based on cultural context
-const suggestedQuestions = [
-  {
-    text: "ما هي الأطعمة المناسبة خلال فترة الحمل حسب التقاليد الإسلامية؟",
-    category: "nutrition",
-  },
-  {
-    text: "كيف أحافظ على صلاتي خلال الحمل إذا كان الوقوف صعباً علي؟",
-    category: "worship",
-  },
-  {
-    text: "هل يمكنني استخدام الأدوية المسكنة أثناء الحمل وما هو البديل الطبيعي؟",
-    category: "medical",
-  },
-  {
-    text: "ما هي الأدعية المأثورة للحامل والجنين؟",
-    category: "worship",
-  },
-  {
-    text: "كيف يؤثر الصيام في رمضان على الحمل؟",
-    category: "worship",
-  },
-  {
-    text: "ما هي علامات خطر الحمل التي يجب أن أنتبه لها؟",
-    category: "medical",
-  },
-];
-
-// Simulated response generation
-const generateResponse = (question: string): Message => {
-  // Simulate AI processing
-  let hasQuran = question.includes("دعاء") || question.includes("أدعية") || question.includes("قرآن");
-  let hasHadith = question.includes("حديث") || question.includes("السنة") || question.includes("النبي");
-  let isMedical = question.includes("صحة") || 
-                  question.includes("طبي") || 
-                  question.includes("مرض") ||
-                  question.includes("ألم") ||
-                  question.includes("دواء");
-  
-  let response = "";
-  let sources: string[] = [];
-  
-  if (question.includes("الأطعمة") || question.includes("التغذية") || question.includes("غذاء")) {
-    response = "من الناحية الطبية، ينصح الأطباء بتناول الأطعمة الغنية بالفولات مثل الخضروات الورقية الداكنة والحمضيات والبقوليات. وفي التراث الإسلامي، ورد في السنة النبوية فضل بعض الأطعمة مثل التمر والعسل والحبة السوداء. وقد أشارت دراسات حديثة إلى فوائد التمر للحامل خاصة في الأسابيع الأخيرة من الحمل.";
-    sources = ["صحيح البخاري: كتاب الأطعمة", "دراسة جامعة الملك سعود 2019: فوائد التمر للحامل"];
-  } else if (question.includes("صلاة") || question.includes("صلاتي")) {
-    response = "يمكنك أداء الصلاة جالسة إذا كان الوقوف يسبب لك مشقة أو تعباً شديداً. ذكر الفقهاء أن المشقة تجلب التيسير، والله تعالى يقول: (لا يكلف الله نفساً إلا وسعها). ويمكنك الجمع بين الصلوات عند الحاجة بحسب رأي بعض المذاهب الفقهية.";
-    sources = ["سورة البقرة: 286", "فتاوى اللجنة الدائمة للإفتاء: 6/244"];
-    hasQuran = true;
-  } else if (question.includes("مسكنة") || question.includes("أدوية")) {
-    response = "من الناحية الطبية، هناك بعض المسكنات الآمنة أثناء الحمل مثل الباراسيتامول (تحت إشراف الطبيب)، ولكن يجب تجنب مضادات الالتهاب غير الستيرويدية مثل الإيبوبروفين. أما البدائل الطبيعية فتشمل الراحة، والكمادات الدافئة، وتدليك المناطق المؤلمة برفق. ورد في الطب النبوي استخدام الحبة السوداء والعسل لتخفيف بعض الآلام.";
-    sources = ["منظمة الصحة العالمية: إرشادات استخدام الأدوية أثناء الحمل", "صحيح مسلم: باب التداوي بالحبة السوداء"];
-    isMedical = true;
-    hasHadith = true;
-  } else if (question.includes("أدعية") || question.includes("دعاء")) {
-    response = "من الأدعية المأثورة للحامل: \"اللهم إني أستودعك ما في رحمي، اللهم اجعله خلقاً سوياً، واجعله ذخراً لوالديه\". ويمكن للحامل أن تكثر من الدعاء بما ورد في القرآن على لسان أم مريم: \"رَبِّ إِنِّي نَذَرْتُ لَكَ مَا فِي بَطْنِي مُحَرَّرًا فَتَقَبَّلْ مِنِّي إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ\".";
-    sources = ["سورة آل عمران: 35", "موسوعة الأدعية والأذكار: صفحة 120"];
-    hasQuran = true;
-  } else if (question.includes("رمضان") || question.includes("صيام")) {
-    response = "يجوز للحامل الإفطار في رمضان إذا كان الصيام يضر بها أو بجنينها، وذلك لقوله تعالى: (وَعَلَى الَّذِينَ يُطِيقُونَهُ فِدْيَةٌ طَعَامُ مِسْكِينٍ). واختلف العلماء في وجوب القضاء عليها، فذهب جمهور العلماء إلى وجوب القضاء، بينما يرى ابن عباس رضي الله عنهما أنها تطعم عن كل يوم مسكيناً ولا قضاء عليها.";
-    sources = ["سورة البقرة: 184", "تفسير القرطبي: 2/278", "صحيح البخاري: كتاب الصوم"];
-    hasQuran = true;
-    hasHadith = true;
-  } else if (question.includes("علامات خطر") || question.includes("مخاطر")) {
-    response = "من علامات الخطر التي تستدعي مراجعة الطبيب فوراً: النزيف المهبلي، آلام شديدة في البطن، صداع شديد مع تغيرات في الرؤية، تورم مفاجئ في اليدين أو الوجه، قلة حركة الجنين. وقد حث النبي صلى الله عليه وسلم على المبادرة بالتداوي بقوله: \"تداووا عباد الله، فإن الله لم يضع داء إلا وضع له شفاء\".";
-    sources = ["منظمة الصحة العالمية: دليل رعاية الحوامل", "سنن الترمذي: باب ما جاء في الدواء والحث عليه"];
-    isMedical = true;
-    hasHadith = true;
-  } else {
-    // Default response
-    response = "شكراً على سؤالك. من منظور يجمع بين الطب الحديث والثقافة الإسلامية، يمكنني مساعدتك في مسائل الحمل والأمومة مع احترام الخصوصية الثقافية والدينية. هل لديك سؤال محدد في جانب معين من جوانب الحمل أو رعاية الأطفال؟";
-  }
-  
-  return {
-    id: Math.random().toString(36).substring(2, 9),
-    content: response,
-    role: 'assistant',
-    timestamp: new Date(),
-    sources,
-    hasQuran,
-    hasHadith,
-    isMedical
-  };
-};
+import { ChatMessage, MessageProps } from './ChatMessage';
+import { SuggestedQuestions, SuggestedQuestionProps } from './SuggestedQuestions';
+import { generateResponse, suggestedQuestions } from './responseGenerator';
 
 export function AICulturalAssistant() {
   const { direction, locale } = useCultural();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageProps[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [selectedDialect, setSelectedDialect] = useState('gulf');
@@ -121,7 +23,7 @@ export function AICulturalAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
   
-  // Scroll to bottom of messages
+  // التمرير إلى أسفل الرسائل
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -130,12 +32,12 @@ export function AICulturalAssistant() {
     scrollToBottom();
   }, [messages]);
   
-  // Send a message to the AI
+  // إرسال رسالة إلى الذكاء الاصطناعي
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
     
-    // Add user message
-    const userMessage: Message = {
+    // إضافة رسالة المستخدم
+    const userMessage: MessageProps = {
       id: Math.random().toString(36).substring(2, 9),
       content: inputMessage,
       role: 'user',
@@ -146,13 +48,13 @@ export function AICulturalAssistant() {
     setInputMessage('');
     setIsLoading(true);
     
-    // Simulate AI response with a delay
+    // محاكاة استجابة الذكاء الاصطناعي مع تأخير
     setTimeout(() => {
       const aiResponse = generateResponse(userMessage.content);
       setMessages(prev => [...prev, aiResponse]);
       setIsLoading(false);
       
-      // Read response aloud if audio is enabled
+      // قراءة الاستجابة بصوت عالٍ إذا كان الصوت ممكّناً
       if (audioEnabled && 'speechSynthesis' in window) {
         const speech = new SpeechSynthesisUtterance(aiResponse.content);
         speech.lang = 'ar-SA';
@@ -161,7 +63,7 @@ export function AICulturalAssistant() {
     }, 1500);
   };
   
-  // Handle user pressing Enter to send message
+  // معالجة ضغط المستخدم على Enter لإرسال الرسالة
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -169,14 +71,14 @@ export function AICulturalAssistant() {
     }
   };
   
-  // Toggle voice recording
+  // تبديل تسجيل الصوت
   const handleToggleRecording = () => {
-    // This would typically use the Web Speech API for voice recognition
-    // For the demo, we'll just simulate recording
+    // عادة ما يستخدم واجهة برمجة تطبيقات الكلام للتعرف على الصوت
+    // بالنسبة للعرض التوضيحي، سنقوم فقط بمحاكاة التسجيل
     setIsRecording(!isRecording);
     
     if (!isRecording) {
-      // Start recording - simulated
+      // بدء التسجيل - محاكاة
       setTimeout(() => {
         setInputMessage("كيف يؤثر الصيام في رمضان على الحمل؟");
         setIsRecording(false);
@@ -184,7 +86,7 @@ export function AICulturalAssistant() {
     }
   };
   
-  // Handle selecting a suggested question
+  // معالجة اختيار سؤال مقترح
   const handleSuggestedQuestion = (question: string) => {
     setInputMessage(question);
     setTimeout(() => handleSendMessage(), 100);
@@ -254,7 +156,7 @@ export function AICulturalAssistant() {
         </CardHeader>
         
         <CardContent>
-          {/* Chat Messages */}
+          {/* رسائل الدردشة */}
           <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto p-1">
             {messages.length === 0 ? (
               <div className="text-center py-12">
@@ -266,67 +168,7 @@ export function AICulturalAssistant() {
               </div>
             ) : (
               messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg p-4 ${
-                      message.role === 'user'
-                        ? 'bg-kidmam-purple text-white rounded-br-none'
-                        : 'bg-muted rounded-bl-none'
-                    }`}
-                  >
-                    {message.role === 'assistant' && (
-                      <div className="flex items-center mb-2">
-                        <Avatar className="h-6 w-6 mr-2">
-                          <AvatarImage src="/images/ai-assistant.png" />
-                          <AvatarFallback className="bg-kidmam-teal/20 text-kidmam-teal text-xs">AI</AvatarFallback>
-                        </Avatar>
-                        <span className="text-xs text-foreground font-medium">المساعد الثقافي</span>
-                      </div>
-                    )}
-                    
-                    <div 
-                      className={`${message.hasQuran ? 'font-amiri text-base leading-relaxed' : 'text-sm'}`}
-                    >
-                      {message.content}
-                    </div>
-                    
-                    {message.role === 'assistant' && message.sources && message.sources.length > 0 && (
-                      <div className="mt-2 text-xs text-muted-foreground">
-                        <p className="font-medium">المصادر:</p>
-                        <ul className="list-disc list-inside mt-1 space-y-1">
-                          {message.sources.map((source, index) => (
-                            <li key={index}>{source}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {message.role === 'assistant' && (
-                      <div className="flex items-center mt-2 space-x-2 rtl:space-x-reverse">
-                        {message.hasQuran && (
-                          <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
-                            قرآن
-                          </span>
-                        )}
-                        {message.hasHadith && (
-                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
-                            حديث
-                          </span>
-                        )}
-                        {message.isMedical && (
-                          <span className="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">
-                            طبي
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <ChatMessage key={message.id} message={message} />
               ))
             )}
             
@@ -345,25 +187,16 @@ export function AICulturalAssistant() {
             <div ref={messagesEndRef} />
           </div>
           
-          {/* Suggested questions */}
+          {/* أسئلة مقترحة */}
           {messages.length < 2 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium mb-2">أسئلة مقترحة:</h4>
-              <div className="flex flex-wrap gap-2">
-                {suggestedQuestions.slice(0, 3).map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSuggestedQuestion(question.text)}
-                    className="px-3 py-1.5 rounded-full text-xs bg-kidmam-purple/10 text-kidmam-purple hover:bg-kidmam-purple/20"
-                  >
-                    {question.text}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <SuggestedQuestions 
+              questions={suggestedQuestions} 
+              onSelectQuestion={handleSuggestedQuestion} 
+              limit={3}
+            />
           )}
           
-          {/* Message input */}
+          {/* إدخال الرسالة */}
           <div className="flex items-end space-x-2 rtl:space-x-reverse mt-4">
             <Button
               variant="outline"
@@ -401,4 +234,3 @@ export function AICulturalAssistant() {
     </div>
   );
 }
-

@@ -12,6 +12,7 @@ import PregnancyNotifications from '../components/PregnancyNotifications';
 import AIPregnancyAssistant from '../components/AIPregnancyAssistant';
 import PregnancyDueCalculator from '../components/PregnancyDueCalculator';
 import { AICulturalAssistant } from '../components/cultural/AICulturalAssistant';
+import MedicalAssistant from '../components/medical/MedicalAssistant';
 
 const Index = () => {
   return (
@@ -46,8 +47,13 @@ const Index = () => {
           <PregnancyTracker />
         </div>
 
-        <div className="mb-10">
-          <AICulturalAssistant />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div>
+            <AICulturalAssistant />
+          </div>
+          <div>
+            <MedicalAssistant />
+          </div>
         </div>
       </div>
       
