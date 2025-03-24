@@ -6,7 +6,7 @@ import CulturalSection from '../components/CulturalSection';
 import CallToAction from '../components/CallToAction';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
-import PregnancyTracker from '../components/PregnancyTracker';
+import PregnancyTracker from '../components/pregnancy-tracker';
 import MoodTracker from '../components/MoodTracker';
 import PregnancyNotifications from '../components/PregnancyNotifications';
 import AIPregnancyAssistant from '../components/AIPregnancyAssistant';
